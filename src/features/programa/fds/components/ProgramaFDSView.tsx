@@ -16,9 +16,18 @@ interface ProgramaFDSViewProps {
   asignaciones: AsignacionFDS[]
   canEdit:      boolean
   onEdit:       (parte: ParteFDS, asignacion?: AsignacionFDS) => void
+  emptyMessage?: string
 }
 
-export function ProgramaFDSView({ asignaciones, canEdit, onEdit }: ProgramaFDSViewProps) {
+export function ProgramaFDSView({ asignaciones, canEdit, onEdit, emptyMessage }: ProgramaFDSViewProps) {
+  if (!canEdit && asignaciones.length === 0 && emptyMessage) {
+    return (
+      <div className="rounded-lg border px-4 py-10 text-center text-sm text-muted-foreground">
+        {emptyMessage}
+      </div>
+    )
+  }
+
   const asigByParteId = Object.fromEntries(asignaciones.map((a) => [a.parte_id, a]))
 
   return (

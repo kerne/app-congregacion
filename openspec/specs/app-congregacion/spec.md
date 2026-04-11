@@ -45,6 +45,37 @@ ENTONCES DEBE crearse el primer usuario con rol admin
   Y el sistema DEBE funcionar normalmente a partir de ese punto
 ```
 
+**SPEC-01.5 — Acceso por rol en la interfaz**
+```
+El sistema SHALL diferenciar visualmente la interfaz según el rol del usuario autenticado.
+Un usuario con rol === 'admin' DEBE tener acceso completo a las funciones de gestión.
+Un visitante (anónimo o autenticado sin rol admin) DEBE tener acceso de solo lectura al programa.
+```
+
+```
+DADO que un visitante accede a la URL de la app sin autenticación
+CUANDO la app carga
+ENTONCES DEBE poder ver el programa de la semana actual en modo lectura
+  Y NO DEBE ver controles de edición de asignaciones
+  Y NO DEBE ver la sección "Administración" en el Sidebar
+  Y DEBE ver un botón de "Iniciar sesión" accesible
+```
+
+```
+DADO que un usuario con rol admin en la tabla publicadores completa el flujo OAuth
+CUANDO el sistema autentica al usuario
+ENTONCES DEBE asignarle el rol admin en el contexto de la app
+  Y DEBE mostrar la sección "Administración" en el Sidebar
+  Y DEBE mostrar controles de edición en las páginas de programa
+```
+
+```
+DADO que un usuario completa el flujo OAuth pero su email no está en publicadores
+CUANDO el sistema autentica al usuario
+ENTONCES DEBE tratarlo como visitante (solo lectura)
+  Y NO DEBE mostrar controles de edición ni sección de administración
+```
+
 ---
 
 ## SPEC-02 — Gestión de Publicadores

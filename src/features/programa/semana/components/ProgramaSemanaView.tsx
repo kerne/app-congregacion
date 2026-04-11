@@ -7,9 +7,18 @@ interface ProgramaSemanaViewProps {
   asignaciones: AsignacionSemana[]
   canEdit:      boolean
   onEdit:       (parte: ParteSemana, asignacion?: AsignacionSemana) => void
+  emptyMessage?: string
 }
 
-export function ProgramaSemanaView({ asignaciones, canEdit, onEdit }: ProgramaSemanaViewProps) {
+export function ProgramaSemanaView({ asignaciones, canEdit, onEdit, emptyMessage }: ProgramaSemanaViewProps) {
+  if (!canEdit && asignaciones.length === 0 && emptyMessage) {
+    return (
+      <div className="rounded-lg border px-4 py-10 text-center text-sm text-muted-foreground">
+        {emptyMessage}
+      </div>
+    )
+  }
+
   return (
     <div className="rounded-lg border overflow-hidden">
       <table className="w-full text-sm">

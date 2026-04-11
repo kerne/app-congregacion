@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AlertCircle } from 'lucide-react'
+import { Badge } from '@/shared/components/ui/badge'
 import { NavSemana } from '@/shared/components/NavSemana'
 import { ModalAsignacion } from '@/shared/components/ModalAsignacion'
 import { TableSkeleton } from '@/shared/components/TableSkeleton'
@@ -24,7 +25,7 @@ export function EntreSemana() {
   const [semana, setSemana] = useState(() => toISODate(getLunesDeSemana(new Date())))
   const [modal, setModal]   = useState<{ parte: ParteSemana; asignacion?: AsignacionSemana } | null>(null)
 
-  const { isAdmin } = useCurrentUser()
+  const { isAdmin, loading } = useCurrentUser()
   const { data: asignaciones = [], isLoading, isError, refetch } = useProgramaSemana(semana)
   const { data: publicadores = [] } = usePublicadores(true)
   const upsert  = useUpsertAsignacionSemana()
@@ -42,7 +43,12 @@ export function EntreSemana() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Reunión Entre Semana</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold">Reunión Entre Semana</h1>
+            {!loading && !isAdmin() && (
+              <Badge variant="secondary">Solo lectura</Badge>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground capitalize">
             {formatRangoSemana(parseFecha(semana))}
           </p>
@@ -69,6 +75,11 @@ export function EntreSemana() {
           asignaciones={asignaciones}
           canEdit={isAdmin()}
           onEdit={handleEdit}
+          emptyMessage={
+            isAdmin()
+              ? 'No hay asignaciones — empezá asignando partes'
+              : 'El programa de esta semana no está disponible aún'
+          }
         />
       )}
 

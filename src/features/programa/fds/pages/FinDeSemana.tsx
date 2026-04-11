@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AlertCircle } from 'lucide-react'
+import { Badge } from '@/shared/components/ui/badge'
 import { NavSemana } from '@/shared/components/NavSemana'
 import { ModalAsignacion } from '@/shared/components/ModalAsignacion'
 import { TableSkeleton } from '@/shared/components/TableSkeleton'
@@ -24,7 +25,7 @@ export function FinDeSemana() {
   const [fecha, setFecha] = useState(() => toISODate(getProximoDomingo(new Date())))
   const [modal, setModal] = useState<{ parte: ParteFDS; asignacion?: AsignacionFDS } | null>(null)
 
-  const { isAdmin } = useCurrentUser()
+  const { isAdmin, loading } = useCurrentUser()
   const { data: asignaciones = [], isLoading, isError, refetch } = useProgramaFDS(fecha)
   const { data: publicadores = [] } = usePublicadores(true)
   const upsert  = useUpsertAsignacionFDS()
@@ -38,7 +39,12 @@ export function FinDeSemana() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Reunión Fin de Semana</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold">Reunión Fin de Semana</h1>
+            {!loading && !isAdmin() && (
+              <Badge variant="secondary">Solo lectura</Badge>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground capitalize">
             {formatDomingo(parseFecha(fecha))}
           </p>
@@ -66,6 +72,11 @@ export function FinDeSemana() {
           asignaciones={asignaciones}
           canEdit={isAdmin()}
           onEdit={(parte, asignacion) => setModal({ parte, asignacion })}
+          emptyMessage={
+            isAdmin()
+              ? 'No hay asignaciones — empezá asignando partes'
+              : 'El programa de este domingo no está disponible aún'
+          }
         />
       )}
 
