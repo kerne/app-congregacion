@@ -8,5 +8,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: { flowType: 'pkce' },
+  auth: {
+    flowType: 'pkce',
+    detectSessionInUrl: false, // el intercambio de código lo maneja AuthCallback manualmente
+  },
 })
