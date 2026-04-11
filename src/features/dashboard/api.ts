@@ -1,12 +1,11 @@
 import { supabase } from '@/core/supabase/client'
-import { getLunesDeSemana, toISODate, getDomingoDeSemana } from '@/shared/utils/fechas'
+import { getLunesDeSemana, toISODate } from '@/shared/utils/fechas'
 import { PROGRAMA_SEMANA } from '@/core/config/programa-semana'
 import type { DashboardStats } from '@/core/supabase/types'
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  const hoy    = new Date()
-  const lunes  = toISODate(getLunesDeSemana(hoy))
-  const domingo = toISODate(getDomingoDeSemana(hoy))
+  const hoy   = new Date()
+  const lunes = toISODate(getLunesDeSemana(hoy))
 
   const [pubRes, asigRes] = await Promise.all([
     supabase
