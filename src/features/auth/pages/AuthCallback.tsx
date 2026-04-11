@@ -7,22 +7,27 @@ export function AuthCallback() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    supabase.auth.exchangeCodeForSession(window.location.search)
-      .then(({ error }) => {
-        if (error) {
-          toast.error('Error al autenticar: ' + error.message)
-          navigate('/login')
-          return
-        }
+    // Con detectSessionInUrl: true (default) + flowType: 'pkce',
+    // Supabase maneja el intercambio del code automáticamente.
+    // Solo escuchamos el evento SIGNED_IN y navegamos.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
         const returnTo = sessionStorage.getItem('returnTo') ?? '/'
         sessionStorage.removeItem('returnTo')
         navigate(returnTo, { replace: true })
-      })
-      .catch((err) => {
-        console.error('exchangeCodeForSession error:', err)
-        toast.error('Error inesperado al autenticar')
-        navigate('/login')
-      })
+      }
+    })
+
+    // Fallback: si el intercambio falla, redirigir al login
+    const timeout = setTimeout(() => {
+      toast.error('No se pudo completar la autenticación')
+      navigate('/login', { replace: true })
+    }, 10_000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+    }
   }, [navigate])
 
   return (
