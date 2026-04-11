@@ -21,9 +21,15 @@ export function Header({ onMenuClick }: HeaderProps) {
   const navigate = useNavigate()
 
   async function handleLogout() {
-    await supabase.auth.signOut()
-    toast.success('Sesión cerrada')
-    navigate('/')
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      toast.success('Sesión cerrada')
+      navigate('/login')
+    } catch (err) {
+      console.error('signOut error:', err)
+      toast.error('Error al cerrar sesión')
+    }
   }
 
   const displayName = publicador

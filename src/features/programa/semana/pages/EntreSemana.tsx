@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavSemana } from '@/shared/components/NavSemana'
 import { ModalAsignacion } from '@/shared/components/ModalAsignacion'
+import { TableSkeleton } from '@/shared/components/TableSkeleton'
 import { ProgramaSemanaView } from '../components/ProgramaSemanaView'
 import { useProgramaSemana, useUpsertAsignacionSemana, useDeleteAsignacionSemana } from '../hooks'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
@@ -52,7 +53,7 @@ export function EntreSemana() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12 text-muted-foreground">Cargando programa...</div>
+        <TableSkeleton rows={8} cols={3} />
       ) : (
         <ProgramaSemanaView
           asignaciones={asignaciones}

@@ -1,10 +1,11 @@
-import { Users, CheckCircle, Clock, ArrowRight } from 'lucide-react'
+import { Users, CheckCircle, Clock, ArrowRight, BookOpen, Calendar } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/button'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
 import { useDashboardStats } from '../hooks'
 import { useMisAsignaciones } from '@/features/mis-asignaciones/hooks'
 import { formatFechaCorta, parseFecha } from '@/shared/utils/fechas'
+import { DashboardSkeleton } from '../components/DashboardSkeleton'
 import type { AsignacionPersonal } from '@/core/supabase/types'
 
 function StatCard({ icon: Icon, label, value, color }: {
@@ -62,32 +63,30 @@ export function Dashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {statsLoading ? (
-          <div className="col-span-3 h-20 rounded-lg border bg-muted/30 animate-pulse" />
-        ) : (
-          <>
-            <StatCard
-              icon={Users}
-              label="Publicadores activos"
-              value={stats?.publicadoresActivos ?? 0}
-              color="bg-blue-100 text-blue-700"
-            />
-            <StatCard
-              icon={CheckCircle}
-              label="Asignaciones esta semana"
-              value={stats?.asignacionesEstaSemana ?? 0}
-              color="bg-emerald-100 text-emerald-700"
-            />
-            <StatCard
-              icon={Clock}
-              label="Partes pendientes"
-              value={stats?.partesPendientesEstaSemana ?? 0}
-              color="bg-amber-100 text-amber-700"
-            />
-          </>
-        )}
-      </div>
+      {statsLoading ? (
+        <DashboardSkeleton />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard
+            icon={Users}
+            label="Publicadores activos"
+            value={stats?.publicadoresActivos ?? 0}
+            color="bg-blue-100 text-blue-700"
+          />
+          <StatCard
+            icon={CheckCircle}
+            label="Asignaciones esta semana"
+            value={stats?.asignacionesEstaSemana ?? 0}
+            color="bg-emerald-100 text-emerald-700"
+          />
+          <StatCard
+            icon={Clock}
+            label="Partes pendientes"
+            value={stats?.partesPendientesEstaSemana ?? 0}
+            color="bg-amber-100 text-amber-700"
+          />
+        </div>
+      )}
 
       {/* Mis próximas asignaciones */}
       {isPublicador() && publicador && (
@@ -114,19 +113,24 @@ export function Dashboard() {
       )}
 
       {/* Accesos rápidos */}
-      <div className="grid grid-cols-2 gap-3">
-        <Button variant="outline" asChild className="h-auto py-4 flex-col gap-1">
-          <Link to="/entre-semana">
-            <span className="font-medium">Entre semana</span>
-            <span className="text-xs text-muted-foreground">Ver programa</span>
-          </Link>
-        </Button>
-        <Button variant="outline" asChild className="h-auto py-4 flex-col gap-1">
-          <Link to="/fin-de-semana">
-            <span className="font-medium">Fin de semana</span>
-            <span className="text-xs text-muted-foreground">Ver programa</span>
-          </Link>
-        </Button>
+      <div>
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Accesos rápidos</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Button variant="outline" asChild className="h-auto py-4 flex-col items-center gap-1.5">
+            <Link to="/entre-semana">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <span className="font-medium">Entre semana</span>
+              <span className="text-xs text-muted-foreground">Ver programa</span>
+            </Link>
+          </Button>
+          <Button variant="outline" asChild className="h-auto py-4 flex-col items-center gap-1.5">
+            <Link to="/fin-de-semana">
+              <Calendar className="h-5 w-5 text-primary" />
+              <span className="font-medium">Fin de semana</span>
+              <span className="text-xs text-muted-foreground">Ver programa</span>
+            </Link>
+          </Button>
+        </div>
       </div>
     </div>
   )

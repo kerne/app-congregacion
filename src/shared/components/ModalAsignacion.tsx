@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -56,18 +57,18 @@ export function ModalAsignacion({
 
   const tieneSala = 'tieneSala' in parte ? parte.tieneSala : false
 
-  async function onSubmit(data: AsignacionFormData) {
+  const onSubmit = useCallback(async (data: AsignacionFormData) => {
     await onSave(data)
     reset()
     onClose()
-  }
+  }, [onSave, onClose, reset])
 
-  async function handleDelete() {
+  const handleDelete = useCallback(async () => {
     if (!onDelete) return
     await onDelete()
     reset()
     onClose()
-  }
+  }, [onDelete, onClose, reset])
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { reset(); onClose() } }}>

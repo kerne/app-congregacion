@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import type { PublicadorPublico } from '@/core/supabase/types'
 
@@ -16,15 +17,20 @@ export function PublicadorSelector({
   placeholder = 'Seleccionar publicador...',
   disabled,
 }: PublicadorSelectorProps) {
+  const items = useMemo(
+    () => publicadores.map((p) => ({ id: p.id, label: `${p.nombre} ${p.apellido}` })),
+    [publicadores],
+  )
+
   return (
     <Select value={value} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        {publicadores.map((p) => (
-          <SelectItem key={p.id} value={p.id}>
-            {p.nombre} {p.apellido}
+        {items.map((item) => (
+          <SelectItem key={item.id} value={item.id}>
+            {item.label}
           </SelectItem>
         ))}
       </SelectContent>

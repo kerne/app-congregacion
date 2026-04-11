@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { AppLayout } from './layout/AppLayout'
 import { RequireAuth } from '@/features/auth/RequireAuth'
@@ -8,7 +9,11 @@ import { Dashboard } from '@/features/dashboard/pages/Dashboard'
 import { EntreSemana } from '@/features/programa/semana/pages/EntreSemana'
 import { FinDeSemana } from '@/features/programa/fds/pages/FinDeSemana'
 import { MisAsignaciones } from '@/features/mis-asignaciones/pages/MisAsignaciones'
-import { Publicadores } from '@/features/publicadores/pages/Publicadores'
+import { PublicadoresSkeleton } from '@/features/publicadores/components/PublicadoresSkeleton'
+
+const Publicadores = lazy(() =>
+  import('@/features/publicadores/pages/Publicadores').then((m) => ({ default: m.Publicadores }))
+)
 
 function NotFound() {
   return (
@@ -43,7 +48,9 @@ export function AppRouter() {
           path="admin/publicadores"
           element={
             <RequireRole roles={['admin']}>
-              <Publicadores />
+              <Suspense fallback={<div className="space-y-6"><div className="h-10" /><PublicadoresSkeleton /></div>}>
+                <Publicadores />
+              </Suspense>
             </RequireRole>
           }
         />

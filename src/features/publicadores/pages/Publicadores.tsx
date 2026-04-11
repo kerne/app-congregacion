@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { UserPlus, Pencil, UserCheck, UserX, Users } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { UserPlus, Pencil, UserCheck, UserX, Users, Search, X } from 'lucide-react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -10,6 +10,7 @@ import { Badge } from '@/shared/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/shared/components/ui/dialog'
 import { EmptyState } from '@/shared/components/EmptyState'
+import { PublicadoresSkeleton } from '../components/PublicadoresSkeleton'
 import { usePublicadores, useCreatePublicador, useUpdatePublicador, useToggleActivo } from '../hooks'
 import type { Publicador, PublicadorRol } from '@/core/supabase/types'
 
@@ -140,9 +141,21 @@ export function Publicadores() {
   const [showInactivos, setShowInactivos] = useState(false)
   const [modalOpen, setModalOpen]         = useState(false)
   const [editando, setEditando]           = useState<Publicador | undefined>()
+  const [searchQuery, setSearchQuery]     = useState('')
+  const [rolFilter, setRolFilter]         = useState<PublicadorRol | 'todos'>('todos')
 
   const { data: publicadores = [], isLoading } = usePublicadores(!showInactivos)
   const toggleActivo = useToggleActivo()
+
+  const publicadoresFiltrados = useMemo(() => {
+    return publicadores.filter((p) => {
+      const matchNombre = `${p.nombre} ${p.apellido}`.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchRol    = rolFilter === 'todos' || p.rol === rolFilter
+      return matchNombre && matchRol
+    })
+  }, [publicadores, searchQuery, rolFilter])
+
+  const hayFiltrosActivos = searchQuery !== '' || rolFilter !== 'todos'
 
   function handleEditar(p: Publicador) {
     setEditando(p)
@@ -152,6 +165,11 @@ export function Publicadores() {
   function handleNuevo() {
     setEditando(undefined)
     setModalOpen(true)
+  }
+
+  function limpiarFiltros() {
+    setSearchQuery('')
+    setRolFilter('todos')
   }
 
   return (
@@ -167,26 +185,69 @@ export function Publicadores() {
         </Button>
       </div>
 
-      {/* Filtro */}
-      <label className="flex items-center gap-2 text-sm cursor-pointer w-fit">
-        <input
-          type="checkbox"
-          checked={showInactivos}
-          onChange={(e) => setShowInactivos(e.target.checked)}
-          className="rounded"
-        />
-        Mostrar inactivos
-      </label>
+      {/* Filtros */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nombre..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+        <Select value={rolFilter} onValueChange={(v) => setRolFilter(v as PublicadorRol | 'todos')}>
+          <SelectTrigger className="w-full sm:w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos los roles</SelectItem>
+            <SelectItem value="publicador">Publicador</SelectItem>
+            <SelectItem value="editor">Editor</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+          </SelectContent>
+        </Select>
+        <label className="flex items-center gap-2 text-sm cursor-pointer whitespace-nowrap">
+          <input
+            type="checkbox"
+            checked={showInactivos}
+            onChange={(e) => setShowInactivos(e.target.checked)}
+            className="rounded"
+          />
+          Mostrar inactivos
+        </label>
+      </div>
+
+      {/* Contador */}
+      {!isLoading && publicadores.length > 0 && (
+        <p className="text-sm text-muted-foreground">
+          {hayFiltrosActivos
+            ? `${publicadoresFiltrados.length} de ${publicadores.length} publicadores`
+            : `${publicadores.length} publicadores`}
+        </p>
+      )}
 
       {/* Tabla */}
       {isLoading ? (
-        <div className="text-center py-8 text-muted-foreground">Cargando...</div>
+        <PublicadoresSkeleton />
       ) : publicadores.length === 0 ? (
         <EmptyState
           icon={Users}
           title="No hay publicadores"
           description="Agregá el primer publicador para comenzar"
           action={<Button onClick={handleNuevo}><UserPlus className="h-4 w-4" />Nuevo publicador</Button>}
+        />
+      ) : publicadoresFiltrados.length === 0 ? (
+        <EmptyState
+          icon={Search}
+          title="Sin resultados"
+          description="No se encontraron publicadores para tu búsqueda"
+          action={
+            <Button variant="outline" onClick={limpiarFiltros}>
+              <X className="h-4 w-4" />
+              Limpiar búsqueda
+            </Button>
+          }
         />
       ) : (
         <div className="rounded-lg border overflow-x-auto">
@@ -201,7 +262,7 @@ export function Publicadores() {
               </tr>
             </thead>
             <tbody>
-              {publicadores.map((p) => (
+              {publicadoresFiltrados.map((p) => (
                 <tr key={p.id} className="border-t hover:bg-muted/30 transition-colors">
                   <td className="p-3 font-medium">{p.nombre} {p.apellido}</td>
                   <td className="p-3 text-muted-foreground hidden sm:table-cell">{p.email}</td>

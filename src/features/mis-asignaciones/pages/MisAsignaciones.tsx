@@ -3,6 +3,7 @@ import { Badge } from '@/shared/components/ui/badge'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
 import { useMisAsignaciones } from '../hooks'
+import { AsignacionesSkeleton } from '../components/AsignacionesSkeleton'
 import { formatFechaCorta, parseFecha } from '@/shared/utils/fechas'
 import type { AsignacionPersonal } from '@/core/supabase/types'
 
@@ -40,12 +41,12 @@ export function MisAsignaciones() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8 text-muted-foreground">Cargando...</div>
+        <AsignacionesSkeleton />
       ) : asignaciones.length === 0 ? (
         <EmptyState
           icon={BookOpen}
           title="No tenés asignaciones próximas"
-          description="Cuando el editor te asigne una parte, aparecerá acá"
+          description="No hay partes asignadas para las próximas semanas. El editor te notificará cuando tengas una."
         />
       ) : (
         <div className="space-y-2">

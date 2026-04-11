@@ -18,6 +18,11 @@ export function AuthCallback() {
         sessionStorage.removeItem('returnTo')
         navigate(returnTo, { replace: true })
       })
+      .catch((err) => {
+        console.error('exchangeCodeForSession error:', err)
+        toast.error('Error inesperado al autenticar')
+        navigate('/login')
+      })
   }, [navigate])
 
   return (

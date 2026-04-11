@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavSemana } from '@/shared/components/NavSemana'
 import { ModalAsignacion } from '@/shared/components/ModalAsignacion'
+import { TableSkeleton } from '@/shared/components/TableSkeleton'
 import { ProgramaFDSView } from '../components/ProgramaFDSView'
 import { useProgramaFDS, useUpsertAsignacionFDS, useDeleteAsignacionFDS } from '../hooks'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
@@ -49,7 +50,7 @@ export function FinDeSemana() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12 text-muted-foreground">Cargando programa...</div>
+        <TableSkeleton rows={6} cols={3} />
       ) : (
         <ProgramaFDSView
           asignaciones={asignaciones}
