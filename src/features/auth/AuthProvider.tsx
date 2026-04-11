@@ -23,7 +23,7 @@ async function fetchPublicador(email: string): Promise<Publicador | null> {
   const { data, error } = await supabase
     .from('publicadores')
     .select('*')
-    .eq('email', email)
+    .eq('email', email.toLowerCase())
     .eq('activo', true)
     .maybeSingle()
 
