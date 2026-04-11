@@ -15,7 +15,7 @@ export async function getAsignacionesFDS(fecha: string): Promise<AsignacionFDS[]
     .eq('fecha', fecha)
 
   if (error) throw error
-  return data as AsignacionFDS[]
+  return (data ?? []) as AsignacionFDS[]
 }
 
 export async function upsertAsignacionFDS(

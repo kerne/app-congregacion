@@ -15,7 +15,7 @@ export async function getAsignacionesSemana(semana: string): Promise<AsignacionS
     .eq('semana', semana)
 
   if (error) throw error
-  return data as AsignacionSemana[]
+  return (data ?? []) as AsignacionSemana[]
 }
 
 export async function upsertAsignacionSemana(

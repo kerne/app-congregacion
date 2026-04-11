@@ -8,16 +8,15 @@ export function useProgramaSemana(semana: string) {
   return useQuery({
     queryKey: queryKeys.asignacionesSemana.semana(semana),
     queryFn:  () => getAsignacionesSemana(semana),
-    enabled:  !!semana,
   })
 }
 
-export function useUpsertAsignacionSemana(semana: string) {
+export function useUpsertAsignacionSemana() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ parteId, data, asignacionId }: { parteId: string; data: AsignacionFormData; asignacionId?: string }) =>
+    mutationFn: ({ semana, parteId, data, asignacionId }: { semana: string; parteId: string; data: AsignacionFormData; asignacionId?: string }) =>
       upsertAsignacionSemana(semana, parteId, data, asignacionId),
-    onSuccess: () => {
+    onSuccess: (_, { semana }) => {
       qc.invalidateQueries({ queryKey: queryKeys.asignacionesSemana.semana(semana) })
       toast.success('Asignación guardada')
     },
@@ -25,11 +24,11 @@ export function useUpsertAsignacionSemana(semana: string) {
   })
 }
 
-export function useDeleteAsignacionSemana(semana: string) {
+export function useDeleteAsignacionSemana() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => deleteAsignacionSemana(id),
-    onSuccess: () => {
+    mutationFn: ({ id }: { id: string; semana: string }) => deleteAsignacionSemana(id),
+    onSuccess: (_, { semana }) => {
       qc.invalidateQueries({ queryKey: queryKeys.asignacionesSemana.semana(semana) })
       toast.success('Asignación eliminada')
     },

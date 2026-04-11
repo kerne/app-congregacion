@@ -1,7 +1,10 @@
 import { useState } from 'react'
+import { AlertCircle } from 'lucide-react'
 import { NavSemana } from '@/shared/components/NavSemana'
 import { ModalAsignacion } from '@/shared/components/ModalAsignacion'
 import { TableSkeleton } from '@/shared/components/TableSkeleton'
+import { EmptyState } from '@/shared/components/EmptyState'
+import { Button } from '@/shared/components/ui/button'
 import { ProgramaFDSView } from '../components/ProgramaFDSView'
 import { useProgramaFDS, useUpsertAsignacionFDS, useDeleteAsignacionFDS } from '../hooks'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
@@ -22,10 +25,10 @@ export function FinDeSemana() {
   const [modal, setModal] = useState<{ parte: ParteFDS; asignacion?: AsignacionFDS } | null>(null)
 
   const { isEditor } = useCurrentUser()
-  const { data: asignaciones = [], isLoading } = useProgramaFDS(fecha)
-  const { data: publicadores = [] }            = usePublicadores(true)
-  const upsert  = useUpsertAsignacionFDS(fecha)
-  const eliminar = useDeleteAsignacionFDS(fecha)
+  const { data: asignaciones = [], isLoading, isError, refetch } = useProgramaFDS(fecha)
+  const { data: publicadores = [] } = usePublicadores(true)
+  const upsert  = useUpsertAsignacionFDS()
+  const eliminar = useDeleteAsignacionFDS()
 
   const publicadoresPublicos: PublicadorPublico[] = publicadores.map(
     ({ id, nombre, apellido, rol }) => ({ id, nombre, apellido, rol }),
@@ -51,6 +54,13 @@ export function FinDeSemana() {
 
       {isLoading ? (
         <TableSkeleton rows={6} cols={3} />
+      ) : isError ? (
+        <EmptyState
+          icon={AlertCircle}
+          title="No se pudo cargar el programa"
+          description="Hubo un error al cargar los datos. Verificá tu conexión e intentá nuevamente."
+          action={<Button variant="outline" onClick={() => refetch()}>Reintentar</Button>}
+        />
       ) : (
         <ProgramaFDSView
           asignaciones={asignaciones}
@@ -68,6 +78,7 @@ export function FinDeSemana() {
           publicadores={publicadoresPublicos}
           onSave={(data) =>
             upsert.mutateAsync({
+              fecha,
               parteId:      modal.parte.id,
               data,
               asignacionId: modal.asignacion?.id,
@@ -75,7 +86,7 @@ export function FinDeSemana() {
           }
           onDelete={
             modal.asignacion
-              ? () => eliminar.mutateAsync(modal.asignacion!.id)
+              ? () => eliminar.mutateAsync({ id: modal.asignacion!.id, fecha })
               : undefined
           }
           isSaving={upsert.isPending}

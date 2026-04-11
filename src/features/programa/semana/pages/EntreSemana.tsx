@@ -1,7 +1,10 @@
 import { useState } from 'react'
+import { AlertCircle } from 'lucide-react'
 import { NavSemana } from '@/shared/components/NavSemana'
 import { ModalAsignacion } from '@/shared/components/ModalAsignacion'
 import { TableSkeleton } from '@/shared/components/TableSkeleton'
+import { EmptyState } from '@/shared/components/EmptyState'
+import { Button } from '@/shared/components/ui/button'
 import { ProgramaSemanaView } from '../components/ProgramaSemanaView'
 import { useProgramaSemana, useUpsertAsignacionSemana, useDeleteAsignacionSemana } from '../hooks'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
@@ -22,10 +25,10 @@ export function EntreSemana() {
   const [modal, setModal]   = useState<{ parte: ParteSemana; asignacion?: AsignacionSemana } | null>(null)
 
   const { isEditor } = useCurrentUser()
-  const { data: asignaciones = [], isLoading } = useProgramaSemana(semana)
-  const { data: publicadores = [] }            = usePublicadores(true)
-  const upsert  = useUpsertAsignacionSemana(semana)
-  const eliminar = useDeleteAsignacionSemana(semana)
+  const { data: asignaciones = [], isLoading, isError, refetch } = useProgramaSemana(semana)
+  const { data: publicadores = [] } = usePublicadores(true)
+  const upsert  = useUpsertAsignacionSemana()
+  const eliminar = useDeleteAsignacionSemana()
 
   const publicadoresPublicos: PublicadorPublico[] = publicadores.map(
     ({ id, nombre, apellido, rol }) => ({ id, nombre, apellido, rol }),
@@ -54,6 +57,13 @@ export function EntreSemana() {
 
       {isLoading ? (
         <TableSkeleton rows={8} cols={3} />
+      ) : isError ? (
+        <EmptyState
+          icon={AlertCircle}
+          title="No se pudo cargar el programa"
+          description="Hubo un error al cargar los datos. Verificá tu conexión e intentá nuevamente."
+          action={<Button variant="outline" onClick={() => refetch()}>Reintentar</Button>}
+        />
       ) : (
         <ProgramaSemanaView
           asignaciones={asignaciones}
@@ -71,6 +81,7 @@ export function EntreSemana() {
           publicadores={publicadoresPublicos}
           onSave={(data) =>
             upsert.mutateAsync({
+              semana,
               parteId:      modal.parte.id,
               data,
               asignacionId: modal.asignacion?.id,
@@ -78,7 +89,7 @@ export function EntreSemana() {
           }
           onDelete={
             modal.asignacion
-              ? () => eliminar.mutateAsync(modal.asignacion!.id)
+              ? () => eliminar.mutateAsync({ id: modal.asignacion!.id, semana })
               : undefined
           }
           isSaving={upsert.isPending}

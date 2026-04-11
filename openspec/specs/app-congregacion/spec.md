@@ -106,6 +106,27 @@ ENTONCES DEBE mostrar el programa de la semana actual por defecto
   Y las partes sin asignado DEBEN estar visualmente marcadas como pendientes
 ```
 
+### SPEC-03.1b — Carga del programa con manejo de estado
+```
+DADO que el usuario navega a "/entre-semana" o "/fin-de-semana"
+CUANDO Supabase retorna filas
+ENTONCES la tabla DEBE mostrar las partes con sus asignados correctamente
+
+DADO que el usuario navega a una semana sin asignaciones
+CUANDO la query retorna vacío
+ENTONCES la tabla DEBE mostrarse vacía sin mensaje de error
+
+DADO que la query a Supabase falla (error de red, RLS, timeout)
+CUANDO la página está en estado de error
+ENTONCES DEBE mostrarse un estado de error con mensaje descriptivo y botón "Reintentar"
+  Y al hacer click en "Reintentar" DEBE ejecutarse nuevamente la query
+
+DADO que el usuario guarda una asignación en la semana A
+CUANDO navega a semana B y vuelve a semana A
+ENTONCES la asignación guardada en semana A DEBE seguir visible
+  (el cache se invalida con la semana correcta en cada mutación)
+```
+
 ### SPEC-03.2 — Navegación entre semanas
 ```
 DADO que el usuario está en la vista Entre Semana

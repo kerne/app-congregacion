@@ -8,16 +8,15 @@ export function useProgramaFDS(fecha: string) {
   return useQuery({
     queryKey: queryKeys.asignacionesFds.fecha(fecha),
     queryFn:  () => getAsignacionesFDS(fecha),
-    enabled:  !!fecha,
   })
 }
 
-export function useUpsertAsignacionFDS(fecha: string) {
+export function useUpsertAsignacionFDS() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ parteId, data, asignacionId }: { parteId: string; data: AsignacionFormData; asignacionId?: string }) =>
+    mutationFn: ({ fecha, parteId, data, asignacionId }: { fecha: string; parteId: string; data: AsignacionFormData; asignacionId?: string }) =>
       upsertAsignacionFDS(fecha, parteId, data, asignacionId),
-    onSuccess: () => {
+    onSuccess: (_, { fecha }) => {
       qc.invalidateQueries({ queryKey: queryKeys.asignacionesFds.fecha(fecha) })
       toast.success('Asignación guardada')
     },
@@ -25,11 +24,11 @@ export function useUpsertAsignacionFDS(fecha: string) {
   })
 }
 
-export function useDeleteAsignacionFDS(fecha: string) {
+export function useDeleteAsignacionFDS() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => deleteAsignacionFDS(id),
-    onSuccess: () => {
+    mutationFn: ({ id }: { id: string; fecha: string }) => deleteAsignacionFDS(id),
+    onSuccess: (_, { fecha }) => {
       qc.invalidateQueries({ queryKey: queryKeys.asignacionesFds.fecha(fecha) })
       toast.success('Asignación eliminada')
     },
