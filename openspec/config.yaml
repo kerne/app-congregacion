@@ -1,20 +1,52 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  Project: app-congregacion — Reuniones Congregacion (Church meetings app)
+  Tech stack: React, Vercel (hosting), Supabase (database + auth + realtime)
+  Architecture: SPA frontend (React) + Supabase BaaS backend
+  Domain: Church/congregation meeting management
+  Deployment: Vercel (automatic deploys from main branch)
+  Database: PostgreSQL via Supabase (RLS policies expected)
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+strict_tdd: false
+# NOTE: Strict TDD Mode DISABLED — no test runner detected yet.
+# Add Vitest (recommended for React/Vite projects) then re-run /sdd-init.
+
+testing:
+  runner: NOT FOUND
+  unit: NOT AVAILABLE
+  integration: NOT AVAILABLE
+  e2e: NOT AVAILABLE
+  coverage: NOT AVAILABLE
+  linter: NOT AVAILABLE (configure ESLint after stack setup)
+  type_checker: NOT AVAILABLE (TypeScript recommended)
+  formatter: NOT AVAILABLE (Prettier recommended)
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Identify affected Supabase tables, RLS policies, and React components
+    - Consider Vercel environment variables for secrets
+  specs:
+    - Use Given/When/Then format for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Include Supabase RLS policy requirements for data access scenarios
+  design:
+    - Include sequence diagrams for complex flows (auth, realtime subscriptions)
+    - Document Supabase schema decisions with rationale
+    - Note Vercel Edge vs Serverless function tradeoffs when relevant
+  tasks:
+    - Group tasks by phase (infrastructure, implementation, testing)
+    - Use hierarchical numbering (1.1, 1.2, etc.)
+    - Keep tasks small enough to complete in one session
+  apply:
+    - Follow existing code patterns and conventions
+    - Use Supabase client (not raw SQL) for all data access
+    - Always apply RLS — never bypass with service role key in frontend
+  verify:
+    - Run tests if test infrastructure exists
+    - Compare implementation against every spec scenario
+    - Verify RLS policies are correct for each scenario
+  archive:
+    - Warn before merging destructive deltas (large removals)
+    - Note any Supabase migration files created

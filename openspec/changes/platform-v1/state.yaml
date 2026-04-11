@@ -1,0 +1,14 @@
+change: platform-v1
+description: Implementación completa de la plataforma app-congregacion v1.0
+status: tasks
+created: 2026-04-11
+updated: 2026-04-11
+
+phases:
+  proposal: done
+  spec: done
+  design: done
+  tasks: done
+  apply: done
+  verify: pending
+  archive: pending
