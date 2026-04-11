@@ -5,6 +5,8 @@ import {
   Star,
   BookOpen,
   Users,
+  Settings,
+  LayoutGrid,
 } from 'lucide-react'
 import { cn } from '@/shared/utils/cn'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
@@ -18,22 +20,26 @@ interface NavItem {
   label: string
   icon: React.ElementType
   requiresAuth?: boolean
-  requiresRole?: string[]
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: '/',                   label: 'Dashboard',       icon: LayoutDashboard },
-  { to: '/entre-semana',       label: 'Entre semana',    icon: Calendar        },
-  { to: '/fin-de-semana',      label: 'Fin de semana',   icon: Star            },
-  { to: '/mis-asignaciones',   label: 'Mis asignaciones',icon: BookOpen, requiresAuth: true },
-  { to: '/admin/publicadores', label: 'Publicadores',    icon: Users, requiresRole: ['admin'] },
+  { to: '/',                 label: 'Dashboard',        icon: LayoutDashboard },
+  { to: '/entre-semana',    label: 'Entre semana',      icon: Calendar        },
+  { to: '/fin-de-semana',   label: 'Fin de semana',     icon: Star            },
+  { to: '/mis-asignaciones',label: 'Mis asignaciones',  icon: BookOpen, requiresAuth: true },
+]
+
+const ADMIN_ITEMS: NavItem[] = [
+  { to: '/admin',               label: 'Panel',         icon: LayoutGrid },
+  { to: '/admin/publicadores',  label: 'Publicadores',  icon: Users      },
 ]
 
 export function Sidebar({ onNavigate }: SidebarProps) {
-  const { rol } = useCurrentUser()
+  const { rol, user, loading } = useCurrentUser()
+  const isAdmin = !loading && rol === 'admin'
 
   const visibleItems = NAV_ITEMS.filter((item) => {
-    if (item.requiresRole && (!rol || !item.requiresRole.includes(rol))) return false
+    if (item.requiresAuth && !user) return false
     return true
   })
 
@@ -70,6 +76,36 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             {item.label}
           </NavLink>
         ))}
+
+        {isAdmin && (
+          <>
+            <div className="pt-3 pb-1 px-3">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <Settings className="h-3 w-3" />
+                Administración
+              </p>
+            </div>
+            {ADMIN_ITEMS.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/admin'}
+                onClick={onNavigate}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors min-h-[44px]',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                  )
+                }
+              >
+                <item.icon className="h-4 w-4 shrink-0" />
+                {item.label}
+              </NavLink>
+            ))}
+          </>
+        )}
       </div>
 
       {/* Footer */}

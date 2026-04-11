@@ -24,7 +24,7 @@ export function FinDeSemana() {
   const [fecha, setFecha] = useState(() => toISODate(getProximoDomingo(new Date())))
   const [modal, setModal] = useState<{ parte: ParteFDS; asignacion?: AsignacionFDS } | null>(null)
 
-  const { isEditor } = useCurrentUser()
+  const { isAdmin } = useCurrentUser()
   const { data: asignaciones = [], isLoading, isError, refetch } = useProgramaFDS(fecha)
   const { data: publicadores = [] } = usePublicadores(true)
   const upsert  = useUpsertAsignacionFDS()
@@ -64,7 +64,7 @@ export function FinDeSemana() {
       ) : (
         <ProgramaFDSView
           asignaciones={asignaciones}
-          canEdit={isEditor()}
+          canEdit={isAdmin()}
           onEdit={(parte, asignacion) => setModal({ parte, asignacion })}
         />
       )}

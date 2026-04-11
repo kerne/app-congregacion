@@ -24,7 +24,7 @@ export function EntreSemana() {
   const [semana, setSemana] = useState(() => toISODate(getLunesDeSemana(new Date())))
   const [modal, setModal]   = useState<{ parte: ParteSemana; asignacion?: AsignacionSemana } | null>(null)
 
-  const { isEditor } = useCurrentUser()
+  const { isAdmin } = useCurrentUser()
   const { data: asignaciones = [], isLoading, isError, refetch } = useProgramaSemana(semana)
   const { data: publicadores = [] } = usePublicadores(true)
   const upsert  = useUpsertAsignacionSemana()
@@ -67,7 +67,7 @@ export function EntreSemana() {
       ) : (
         <ProgramaSemanaView
           asignaciones={asignaciones}
-          canEdit={isEditor()}
+          canEdit={isAdmin()}
           onEdit={handleEdit}
         />
       )}
