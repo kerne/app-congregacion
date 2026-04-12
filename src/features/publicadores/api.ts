@@ -2,11 +2,11 @@ import { supabase } from '@/core/supabase/client'
 import type { Publicador, PublicadorRol } from '@/core/supabase/types'
 
 export interface CreatePublicadorData {
-  nombre:   string
-  apellido: string
-  email:    string
-  telefono?: string
-  rol:      PublicadorRol
+  nombre:    string
+  apellido:  string
+  email?:    string | null
+  telefono?: string | null
+  rol:       PublicadorRol
 }
 
 export interface UpdatePublicadorData extends Partial<CreatePublicadorData> {}

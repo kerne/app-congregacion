@@ -18,7 +18,7 @@ import type { Publicador, PublicadorRol } from '@/core/supabase/types'
 const schema = z.object({
   nombre:   z.string().min(1, 'Requerido'),
   apellido: z.string().min(1, 'Requerido'),
-  email:    z.string().email('Email inválido'),
+  email:    z.string().email('Email inválido').optional().or(z.literal('')),
   telefono: z.string().optional(),
   rol:      z.enum(['publicador', 'editor', 'admin']),
 })

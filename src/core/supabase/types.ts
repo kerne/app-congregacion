@@ -4,7 +4,7 @@ export interface Publicador {
   id: string
   nombre: string
   apellido: string
-  email: string
+  email: string | null
   telefono: string | null
   rol: PublicadorRol
   activo: boolean
