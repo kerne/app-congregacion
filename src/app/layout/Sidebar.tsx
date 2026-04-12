@@ -23,16 +23,16 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: '/',                 label: 'Dashboard',        icon: LayoutDashboard },
-  { to: '/entre-semana',    label: 'Entre semana',      icon: Calendar        },
-  { to: '/fin-de-semana',   label: 'Fin de semana',     icon: Star            },
-  { to: '/mis-asignaciones',label: 'Mis asignaciones',  icon: BookOpen, requiresAuth: true },
+  { to: '/',                              label: 'Dashboard',           icon: LayoutDashboard },
+  { to: '/entre-semana',                  label: 'Entre semana',        icon: Calendar        },
+  { to: '/fin-de-semana',                 label: 'Fin de semana',       icon: Star            },
+  { to: '/admin/configuracion-reuniones', label: 'Config. reuniones',   icon: Settings        },
+  { to: '/mis-asignaciones',              label: 'Mis asignaciones',    icon: BookOpen, requiresAuth: true },
 ]
 
 const ADMIN_ITEMS: NavItem[] = [
-  { to: '/admin',                              label: 'Panel',                   icon: LayoutGrid },
-  { to: '/admin/publicadores',                 label: 'Publicadores',            icon: Users      },
-  { to: '/admin/configuracion-reuniones',      label: 'Config. reuniones',       icon: Settings   },
+  { to: '/admin',              label: 'Panel',        icon: LayoutGrid },
+  { to: '/admin/publicadores', label: 'Publicadores', icon: Users      },
 ]
 
 export function Sidebar({ onNavigate }: SidebarProps) {

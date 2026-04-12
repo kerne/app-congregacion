@@ -56,11 +56,7 @@ export function AppRouter() {
         />
         <Route
           path="admin/configuracion-reuniones"
-          element={
-            <RequireRole roles={['admin']}>
-              <ConfiguracionReuniones />
-            </RequireRole>
-          }
+          element={<ConfiguracionReuniones />}
         />
         <Route
           path="admin/publicadores"
