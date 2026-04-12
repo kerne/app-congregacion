@@ -1,26 +1,89 @@
 schema: spec-driven
 
 context: |
-  Project: app-congregacion — Reuniones Congregacion (Church meetings app)
-  Tech stack: React, Vercel (hosting), Supabase (database + auth + realtime)
+  Project: app-congregacion — Sistema de gestión del programa de reuniones de una congregación de Testigos de Jehová
+  Tech stack: React + Vite (SPA), Vercel (hosting), Supabase (PostgreSQL + Auth + RLS)
   Architecture: SPA frontend (React) + Supabase BaaS backend
-  Domain: Church/congregation meeting management
   Deployment: Vercel (automatic deploys from main branch)
-  Database: PostgreSQL via Supabase (RLS policies expected)
+  Database: PostgreSQL via Supabase (RLS policies requeridas en todas las tablas)
 
-strict_tdd: false
+  ## Dominio: Reuniones de la Congregación
+
+  La congregación celebra DOS tipos de reuniones semanales. El administrador asigna manualmente
+  a los publicadores (miembros activos) a cada parte del programa, semana por semana, desde la web.
+
+  ### Roles de usuario
+  - **admin**: puede ver y editar el programa, asignar publicadores a partes, gestionar publicadores
+  - **visitante** (usuario autenticado sin rol admin): solo puede ver el programa en modo lectura
+  - Los publicadores en la tabla `publicadores` tienen campo `rol` que puede ser 'anciano', 'siervo_ministerial', 'publicador', etc.
+    (distinto al rol de usuario en la app: admin vs visitante)
+
+  ### Reunión Entre Semana (midweek — generalmente martes o jueves)
+  Estructura fija de 5 secciones, ~13 partes, duración ~1h45m:
+
+  **1. Apertura** (sección: 'apertura')
+  - Presidente: conduce toda la reunión
+  - Lector (Tesoros): lee pasajes bíblicos durante la sección de Tesoros
+
+  **2. Tesoros de la Biblia** (sección: 'tesoros')
+  - Discurso (10 min): tiene tema, presentado por un anciano o siervo ministerial
+  - Seamos Mejores Maestros (8 min): tiene tema
+  - Búsqueda de Tesoros Bíblicos (10 min): sin tema
+
+  **3. Seamos Mejores Maestros** (sección: 'smt') — partes de estudiantes
+  Estas partes son especiales:
+  - Tienen `tieneAsistente: true` → se asigna un asistente además del orador principal
+  - Tienen `tieneSala: true` → pueden realizarse en Sala A (salón principal) o Sala B (salón auxiliar)
+  - Tienen `tieneTema: true` → requieren un tema/título específico
+  - Parte 1 y 2: obligatorias. Parte 3 y 4: opcionales (pueden no usarse)
+  - Duración: 4 min cada una
+
+  **4. Nuestra Vida Cristiana** (sección: 'nvc')
+  - Parte Vida Cristiana 1 (10 min): tiene tema, obligatoria
+  - Parte Vida Cristiana 2 (10 min): tiene tema, opcional
+  - Estudio Bíblico de la Congregación (30 min): tiene tema, obligatoria, dirigido por un anciano
+
+  **5. Cierre** (sección: 'cierre')
+  - Cierre (Presidente): el mismo presidente que abrió la reunión
+
+  ### Reunión Fin de Semana (weekend — puede ser sábado o domingo, depende de la congregación)
+  Estructura de 4 secciones, 5 partes, duración ~1h.
+  La fecha se almacena como ISO date del día exacto (sábado o domingo según corresponda).
+  IMPORTANTE: el código actual usa funciones nombradas "domingo" pero en realidad representan
+  el día de la reunión FDS, que puede ser sábado o domingo.
+
+  **1. Apertura** (sección: 'apertura')
+  - Presidente: conduce la reunión
+
+  **2. Discurso Público** (sección: 'discurso')
+  - Orador Discurso Público: anciano o siervo ministerial, tiene tema (título del discurso)
+    Puede ser un hermano de la propia congregación o de otra congregación (orador invitado)
+
+  **3. Atalaya** (sección: 'atalaya') — estudio de la revista La Atalaya
+  - Presidente Atalaya: conduce el estudio (generalmente el mismo presidente de la reunión)
+  - Lector Atalaya: lee los párrafos durante el estudio
+
+  **4. Cierre** (sección: 'cierre')
+  - Oración Final: hermano designado para cerrar con oración
+
+  ### Modelo de datos clave
+  - `publicadores`: miembros activos de la congregación. Campos: id, nombre, apellido, activo, rol (anciano/siervo_ministerial/publicador)
+  - `asignaciones_semana`: asignaciones de la reunión entre semana. Campos: semana (lunes ISO), parte_id, publicador_id (asignado), asistente_id, sala, tema
+  - `asignaciones_fds`: asignaciones de la reunión fin de semana. Campos: fecha (domingo ISO), parte_id, publicador_id (asignado), tema
+  - La semana se identifica por el lunes (fecha ISO). El domingo se identifica por su fecha ISO directa.
+  - Los IDs de partes son strings estáticos definidos en `src/core/config/programa-semana.ts` y `src/core/config/programa-fds.ts`
+
+  ### Flujo de trabajo del administrador
+  1. Navega a /entre-semana o /fin-de-semana y selecciona la semana/domingo
+  2. Ve la tabla del programa con el estado de cada parte (asignada o "Pendiente")
+  3. Hace clic en el botón de editar de cada parte para abrir el modal de asignación
+  4. En el modal: selecciona publicador de la lista, opcionalmente escribe tema, selecciona sala (SMT)
+  5. Guarda → la asignación se persiste en Supabase vía upsert
+  6. El badge de "partes pendientes" en el AdminPanel se actualiza automáticamente (React Query)
+
+strict_tdd: true
 # NOTE: Strict TDD Mode DISABLED — no test runner detected yet.
 # Add Vitest (recommended for React/Vite projects) then re-run /sdd-init.
-
-testing:
-  runner: NOT FOUND
-  unit: NOT AVAILABLE
-  integration: NOT AVAILABLE
-  e2e: NOT AVAILABLE
-  coverage: NOT AVAILABLE
-  linter: NOT AVAILABLE (configure ESLint after stack setup)
-  type_checker: NOT AVAILABLE (TypeScript recommended)
-  formatter: NOT AVAILABLE (Prettier recommended)
 
 rules:
   proposal:

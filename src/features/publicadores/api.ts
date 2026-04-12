@@ -11,7 +11,23 @@ export interface CreatePublicadorData {
 
 export interface UpdatePublicadorData extends Partial<CreatePublicadorData> {}
 
+const COLS_PUBLICAS = 'id, nombre, apellido, activo, rol, creado_en'
+
 export async function getPublicadores(soloActivos = true): Promise<Publicador[]> {
+  let query = supabase
+    .from('publicadores')
+    .select(COLS_PUBLICAS)
+    .order('apellido')
+    .order('nombre')
+
+  if (soloActivos) query = query.eq('activo', true)
+
+  const { data, error } = await query
+  if (error) throw error
+  return data as Publicador[]
+}
+
+export async function getPublicadoresAdmin(soloActivos = true): Promise<Publicador[]> {
   let query = supabase
     .from('publicadores')
     .select('*')

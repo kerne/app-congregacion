@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/shared/components/ui/dialog'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { PublicadoresSkeleton } from '../components/PublicadoresSkeleton'
-import { usePublicadores, useCreatePublicador, useUpdatePublicador, useToggleActivo } from '../hooks'
+import { usePublicadoresAdmin, useCreatePublicador, useUpdatePublicador, useToggleActivo } from '../hooks'
 import type { Publicador, PublicadorRol } from '@/core/supabase/types'
 
 // ─── Schema ────────────────────────────────────────────────────────────────
@@ -144,7 +144,7 @@ export function Publicadores() {
   const [searchQuery, setSearchQuery]     = useState('')
   const [rolFilter, setRolFilter]         = useState<PublicadorRol | 'todos'>('todos')
 
-  const { data: publicadores = [], isLoading } = usePublicadores(!showInactivos)
+  const { data: publicadores = [], isLoading } = usePublicadoresAdmin(!showInactivos)
   const toggleActivo = useToggleActivo()
 
   const publicadoresFiltrados = useMemo(() => {

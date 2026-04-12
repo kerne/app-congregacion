@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { queryKeys } from '@/shared/utils/query-keys'
 import {
   getPublicadores,
+  getPublicadoresAdmin,
   createPublicador,
   updatePublicador,
   toggleActivo,
@@ -14,6 +15,13 @@ export function usePublicadores(soloActivos = true) {
   return useQuery({
     queryKey: queryKeys.publicadores.list(soloActivos),
     queryFn:  () => getPublicadores(soloActivos),
+  })
+}
+
+export function usePublicadoresAdmin(soloActivos = true) {
+  return useQuery({
+    queryKey: [...queryKeys.publicadores.list(soloActivos), 'admin'],
+    queryFn:  () => getPublicadoresAdmin(soloActivos),
   })
 }
 

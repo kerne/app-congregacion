@@ -1,12 +1,31 @@
-import { Users, CheckCircle, Clock, ArrowRight, BookOpen, Calendar } from 'lucide-react'
+import { Users, CheckCircle, Clock, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/button'
+import { Badge } from '@/shared/components/ui/badge'
+import { TableSkeleton } from '@/shared/components/TableSkeleton'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
 import { useDashboardStats } from '../hooks'
 import { useMisAsignaciones } from '@/features/mis-asignaciones/hooks'
-import { formatFechaCorta, parseFecha } from '@/shared/utils/fechas'
+import { useProgramaSemana } from '@/features/programa/semana/hooks'
+import { useProgramaFDS } from '@/features/programa/fds/hooks'
+import { ProgramaSemanaView } from '@/features/programa/semana/components/ProgramaSemanaView'
+import { ProgramaFDSView } from '@/features/programa/fds/components/ProgramaFDSView'
+import {
+  getLunesDeSemana,
+  getProximoDomingo,
+  toISODate,
+  formatRangoSemana,
+  formatDomingo,
+  formatFechaCorta,
+  parseFecha,
+} from '@/shared/utils/fechas'
 import { DashboardSkeleton } from '../components/DashboardSkeleton'
 import type { AsignacionPersonal } from '@/core/supabase/types'
+
+function getVistaSegunDia(): 'semana' | 'fds' {
+  const dia = new Date().getDay()
+  return dia === 0 || dia === 6 ? 'fds' : 'semana'
+}
 
 function StatCard({ icon: Icon, label, value, color }: {
   icon: React.ElementType
@@ -40,6 +59,50 @@ function ProximaAsignacionItem({ a }: { a: AsignacionPersonal }) {
       <span className="text-sm text-muted-foreground shrink-0 ml-2">
         {formatFechaCorta(parseFecha(a.fecha))}
       </span>
+    </div>
+  )
+}
+
+function ProgramaDelDia() {
+  const vista    = getVistaSegunDia()
+  const { isAdmin } = useCurrentUser()
+  const semana   = toISODate(getLunesDeSemana(new Date()))
+  const fechaFds = toISODate(getProximoDomingo(new Date()))
+
+  const semanaQuery = useProgramaSemana(semana)
+  const fdsQuery    = useProgramaFDS(fechaFds)
+
+  const isLoading = vista === 'semana' ? semanaQuery.isLoading : fdsQuery.isLoading
+  const titulo    = vista === 'semana' ? 'Reunión Entre Semana' : 'Reunión Fin de Semana'
+  const subtitulo = vista === 'semana'
+    ? formatRangoSemana(parseFecha(semana))
+    : formatDomingo(parseFecha(fechaFds))
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <h2 className="text-lg font-semibold">{titulo}</h2>
+        {!isAdmin() && <Badge variant="secondary">Solo lectura</Badge>}
+        <span className="text-sm text-muted-foreground capitalize ml-1">{subtitulo}</span>
+      </div>
+
+      {isLoading ? (
+        <TableSkeleton rows={vista === 'semana' ? 8 : 5} cols={3} />
+      ) : vista === 'semana' ? (
+        <ProgramaSemanaView
+          asignaciones={semanaQuery.data ?? []}
+          canEdit={false}
+          onEdit={() => {}}
+          emptyMessage="El programa de esta semana no está disponible aún"
+        />
+      ) : (
+        <ProgramaFDSView
+          asignaciones={fdsQuery.data ?? []}
+          canEdit={false}
+          onEdit={() => {}}
+          emptyMessage="El programa de este fin de semana no está disponible aún"
+        />
+      )}
     </div>
   )
 }
@@ -88,7 +151,7 @@ export function Dashboard() {
         </div>
       )}
 
-      {/* Mis próximas asignaciones */}
+      {/* Mis próximas asignaciones — solo para usuarios autenticados */}
       {isPublicador() && publicador && (
         <div className="rounded-lg border p-5 space-y-3">
           <div className="flex items-center justify-between">
@@ -112,26 +175,8 @@ export function Dashboard() {
         </div>
       )}
 
-      {/* Accesos rápidos */}
-      <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Accesos rápidos</h2>
-        <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" asChild className="h-auto py-4 flex-col items-center gap-1.5">
-            <Link to="/entre-semana">
-              <BookOpen className="h-5 w-5 text-primary" />
-              <span className="font-medium">Entre semana</span>
-              <span className="text-xs text-muted-foreground">Ver programa</span>
-            </Link>
-          </Button>
-          <Button variant="outline" asChild className="h-auto py-4 flex-col items-center gap-1.5">
-            <Link to="/fin-de-semana">
-              <Calendar className="h-5 w-5 text-primary" />
-              <span className="font-medium">Fin de semana</span>
-              <span className="text-xs text-muted-foreground">Ver programa</span>
-            </Link>
-          </Button>
-        </div>
-      </div>
+      {/* Programa del día */}
+      <ProgramaDelDia />
     </div>
   )
 }
