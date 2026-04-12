@@ -1,5 +1,7 @@
 export type PublicadorRol = 'publicador' | 'editor' | 'admin'
 
+export type CargoCongregacion = 'anciano' | 'siervo_ministerial' | 'publicador' | 'publicadora'
+
 export interface Publicador {
   id: string
   nombre: string
@@ -7,12 +9,13 @@ export interface Publicador {
   email: string | null
   telefono: string | null
   rol: PublicadorRol
+  cargo: CargoCongregacion | null
   activo: boolean
   creado_en: string
 }
 
 /** Vista pública — sin datos de contacto */
-export type PublicadorPublico = Pick<Publicador, 'id' | 'nombre' | 'apellido' | 'rol'>
+export type PublicadorPublico = Pick<Publicador, 'id' | 'nombre' | 'apellido' | 'rol' | 'cargo'>
 
 export interface AsignacionSemana {
   id: string

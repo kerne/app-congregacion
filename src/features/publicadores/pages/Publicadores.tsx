@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { EmptyState } from '@/shared/components/EmptyState'
 import { PublicadoresSkeleton } from '../components/PublicadoresSkeleton'
 import { usePublicadoresAdmin, useCreatePublicador, useUpdatePublicador, useToggleActivo } from '../hooks'
-import type { Publicador, PublicadorRol } from '@/core/supabase/types'
+import type { CargoCongregacion, Publicador, PublicadorRol } from '@/core/supabase/types'
 
 // ─── Schema ────────────────────────────────────────────────────────────────
 const schema = z.object({
@@ -21,6 +21,7 @@ const schema = z.object({
   email:    z.string().email('Email inválido').optional().or(z.literal('')),
   telefono: z.string().optional(),
   rol:      z.enum(['publicador', 'editor', 'admin']),
+  cargo:    z.enum(['anciano', 'siervo_ministerial', 'publicador', 'publicadora']).optional(),
 })
 type FormData = z.infer<typeof schema>
 
@@ -46,6 +47,7 @@ function ModalPublicador({
       email:    publicador?.email    ?? '',
       telefono: publicador?.telefono ?? '',
       rol:      publicador?.rol      ?? 'publicador',
+      cargo:    publicador?.cargo    ?? undefined,
     },
   })
 
@@ -101,7 +103,24 @@ function ModalPublicador({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Rol *</Label>
+            <Label>Cargo en la congregación</Label>
+            <Controller control={control} name="cargo"
+              render={({ field }) => (
+                <Select value={field.value ?? ''} onValueChange={(v) => field.onChange(v || undefined)}>
+                  <SelectTrigger><SelectValue placeholder="Sin cargo asignado" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="anciano">Anciano</SelectItem>
+                    <SelectItem value="siervo_ministerial">Siervo ministerial</SelectItem>
+                    <SelectItem value="publicador">Publicador</SelectItem>
+                    <SelectItem value="publicadora">Publicadora</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Rol en la app *</Label>
             <Controller control={control} name="rol"
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
@@ -135,6 +154,13 @@ const ROL_VARIANT: Record<PublicadorRol, 'default' | 'secondary' | 'warning'> = 
   admin:      'default',
   editor:     'warning',
   publicador: 'secondary',
+}
+
+const CARGO_LABEL: Record<CargoCongregacion, string> = {
+  anciano:           'Anciano',
+  siervo_ministerial: 'Siervo min.',
+  publicador:        'Publicador',
+  publicadora:       'Publicadora',
 }
 
 export function Publicadores() {
@@ -256,7 +282,8 @@ export function Publicadores() {
               <tr>
                 <th className="text-left p-3 font-medium">Nombre</th>
                 <th className="text-left p-3 font-medium hidden sm:table-cell">Email</th>
-                <th className="text-left p-3 font-medium">Rol</th>
+                <th className="text-left p-3 font-medium hidden md:table-cell">Cargo</th>
+                <th className="text-left p-3 font-medium">Rol app</th>
                 <th className="text-left p-3 font-medium">Estado</th>
                 <th className="text-right p-3 font-medium">Acciones</th>
               </tr>
@@ -266,6 +293,13 @@ export function Publicadores() {
                 <tr key={p.id} className="border-t hover:bg-muted/30 transition-colors">
                   <td className="p-3 font-medium">{p.nombre} {p.apellido}</td>
                   <td className="p-3 text-muted-foreground hidden sm:table-cell">{p.email}</td>
+                  <td className="p-3 hidden md:table-cell">
+                    {p.cargo ? (
+                      <span className="text-sm">{CARGO_LABEL[p.cargo]}</span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </td>
                   <td className="p-3">
                     <Badge variant={ROL_VARIANT[p.rol]}>{p.rol}</Badge>
                   </td>

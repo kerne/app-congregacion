@@ -1,5 +1,5 @@
 import { supabase } from '@/core/supabase/client'
-import type { Publicador, PublicadorRol } from '@/core/supabase/types'
+import type { CargoCongregacion, Publicador, PublicadorRol } from '@/core/supabase/types'
 
 export interface CreatePublicadorData {
   nombre:    string
@@ -7,11 +7,12 @@ export interface CreatePublicadorData {
   email?:    string | null
   telefono?: string | null
   rol:       PublicadorRol
+  cargo?:    CargoCongregacion | null
 }
 
 export interface UpdatePublicadorData extends Partial<CreatePublicadorData> {}
 
-const COLS_PUBLICAS = 'id, nombre, apellido, activo, rol, creado_en'
+const COLS_PUBLICAS = 'id, nombre, apellido, activo, rol, cargo, creado_en'
 
 export async function getPublicadores(soloActivos = true): Promise<Publicador[]> {
   let query = supabase

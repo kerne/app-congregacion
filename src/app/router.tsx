@@ -7,6 +7,7 @@ import { Login } from '@/features/auth/pages/Login'
 import { AuthCallback } from '@/features/auth/pages/AuthCallback'
 import { Dashboard } from '@/features/dashboard/pages/Dashboard'
 import { AdminPanel } from '@/features/admin/pages/AdminPanel'
+import { ConfiguracionReuniones } from '@/features/configuracion-reuniones/pages/ConfiguracionReuniones'
 import { EntreSemana } from '@/features/programa/semana/pages/EntreSemana'
 import { FinDeSemana } from '@/features/programa/fds/pages/FinDeSemana'
 import { MisAsignaciones } from '@/features/mis-asignaciones/pages/MisAsignaciones'
@@ -50,6 +51,14 @@ export function AppRouter() {
           element={
             <RequireRole roles={['admin']}>
               <AdminPanel />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="admin/configuracion-reuniones"
+          element={
+            <RequireRole roles={['admin']}>
+              <ConfiguracionReuniones />
             </RequireRole>
           }
         />

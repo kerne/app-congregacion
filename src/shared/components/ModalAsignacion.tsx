@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { PublicadorSelector } from './PublicadorSelector'
 import type { ParteSemana } from '@/core/config/programa-semana'
 import type { ParteFDS } from '@/core/config/programa-fds'
-import type { PublicadorPublico } from '@/core/supabase/types'
+import type { CargoCongregacion, PublicadorPublico } from '@/core/supabase/types'
 
 const schema = z.object({
   asignado_id:  z.string().min(1, 'Requerido'),
@@ -32,6 +32,7 @@ interface ModalAsignacionProps {
   onDelete?: () => Promise<void>
   isSaving?: boolean
   isDeleting?: boolean
+  cargosAsistente?: CargoCongregacion[]
 }
 
 export function ModalAsignacion({
@@ -44,6 +45,7 @@ export function ModalAsignacion({
   onDelete,
   isSaving,
   isDeleting,
+  cargosAsistente,
 }: ModalAsignacionProps) {
   const { control, handleSubmit, formState: { errors }, reset } = useForm<AsignacionFormData>({
     resolver: zodResolver(schema),
@@ -89,6 +91,7 @@ export function ModalAsignacion({
                   publicadores={publicadores}
                   value={field.value}
                   onChange={field.onChange}
+                  cargosFiltro={parte.cargosPermitidos}
                 />
               )}
             />
@@ -110,6 +113,7 @@ export function ModalAsignacion({
                     value={field.value ?? ''}
                     onChange={field.onChange}
                     placeholder="Seleccionar asistente..."
+                    cargosFiltro={cargosAsistente}
                   />
                 )}
               />

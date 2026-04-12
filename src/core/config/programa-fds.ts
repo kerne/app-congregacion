@@ -1,3 +1,5 @@
+import type { CargoCongregacion } from '@/core/supabase/types'
+
 export type SeccionFDS = 'apertura' | 'discurso' | 'atalaya' | 'cierre'
 
 export interface ParteFDS {
@@ -6,14 +8,17 @@ export interface ParteFDS {
   seccion: SeccionFDS
   tieneTema: boolean
   tieneAsistente: boolean
+  cargosPermitidos: CargoCongregacion[]
 }
 
+const AM: CargoCongregacion[] = ['anciano', 'siervo_ministerial']
+
 export const PROGRAMA_FDS: ParteFDS[] = [
-  { id: 'fds_presidente',          nombre: 'Presidente',              seccion: 'apertura',  tieneTema: false, tieneAsistente: false },
-  { id: 'fds_orador',              nombre: 'Orador Discurso Público', seccion: 'discurso',  tieneTema: true,  tieneAsistente: false },
-  { id: 'fds_presidente_atalaya',  nombre: 'Presidente Atalaya',      seccion: 'atalaya',   tieneTema: false, tieneAsistente: false },
-  { id: 'fds_lector_atalaya',      nombre: 'Lector Atalaya',          seccion: 'atalaya',   tieneTema: false, tieneAsistente: false },
-  { id: 'fds_oracion_final',       nombre: 'Oración Final',           seccion: 'cierre',    tieneTema: false, tieneAsistente: false },
+  { id: 'fds_presidente',         nombre: 'Presidente',              seccion: 'apertura', tieneTema: false, tieneAsistente: false, cargosPermitidos: AM },
+  { id: 'fds_orador',             nombre: 'Orador Discurso Público', seccion: 'discurso', tieneTema: true,  tieneAsistente: false, cargosPermitidos: AM },
+  { id: 'fds_presidente_atalaya', nombre: 'Presidente Atalaya',      seccion: 'atalaya',  tieneTema: false, tieneAsistente: false, cargosPermitidos: AM },
+  { id: 'fds_lector_atalaya',     nombre: 'Lector Atalaya',          seccion: 'atalaya',  tieneTema: false, tieneAsistente: false, cargosPermitidos: AM },
+  { id: 'fds_oracion_final',      nombre: 'Oración Final',           seccion: 'cierre',   tieneTema: false, tieneAsistente: false, cargosPermitidos: AM },
 ]
 
 export const SECCION_FDS_NOMBRES: Record<SeccionFDS, string> = {

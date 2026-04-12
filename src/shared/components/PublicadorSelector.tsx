@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import type { PublicadorPublico } from '@/core/supabase/types'
+import type { CargoCongregacion, PublicadorPublico } from '@/core/supabase/types'
 
 interface PublicadorSelectorProps {
   publicadores: PublicadorPublico[]
@@ -8,6 +8,7 @@ interface PublicadorSelectorProps {
   onChange: (id: string) => void
   placeholder?: string
   disabled?: boolean
+  cargosFiltro?: CargoCongregacion[]
 }
 
 export function PublicadorSelector({
@@ -16,11 +17,14 @@ export function PublicadorSelector({
   onChange,
   placeholder = 'Seleccionar publicador...',
   disabled,
+  cargosFiltro,
 }: PublicadorSelectorProps) {
-  const items = useMemo(
-    () => publicadores.map((p) => ({ id: p.id, label: `${p.nombre} ${p.apellido}` })),
-    [publicadores],
-  )
+  const items = useMemo(() => {
+    const filtrados = cargosFiltro && cargosFiltro.length > 0
+      ? publicadores.filter((p) => p.cargo !== null && cargosFiltro.includes(p.cargo as CargoCongregacion))
+      : publicadores
+    return filtrados.map((p) => ({ id: p.id, label: `${p.nombre} ${p.apellido}` }))
+  }, [publicadores, cargosFiltro])
 
   return (
     <Select value={value} onValueChange={onChange} disabled={disabled}>
