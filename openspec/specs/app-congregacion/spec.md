@@ -303,13 +303,13 @@ ENTONCES DEBE redirigir a la página de login
 
 ### SPEC-07.1 — Estadísticas básicas
 ```
-DADO que cualquier usuario autenticado accede al dashboard
+DADO que cualquier usuario accede al dashboard
 CUANDO la página carga
 ENTONCES DEBE mostrar:
-  - Total de publicadores activos
   - Cantidad de asignaciones completadas esta semana
   - Cantidad de partes pendientes esta semana
 ```
+<!-- REMOVED: "Total de publicadores activos" — información interna, no relevante para el dashboard público (remove-publicadores-activos-stat, 2026-04-11) -->
 
 ### SPEC-07.2 — Próximas asignaciones personales
 ```
