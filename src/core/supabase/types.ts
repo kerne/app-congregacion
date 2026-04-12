@@ -42,7 +42,6 @@ export interface AsignacionFDS {
 }
 
 export interface DashboardStats {
-  publicadoresActivos: number
   asignacionesEstaSemana: number
   partesPendientesEstaSemana: number
 }

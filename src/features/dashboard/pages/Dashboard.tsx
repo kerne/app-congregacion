@@ -1,4 +1,4 @@
-import { Users, CheckCircle, Clock, ArrowRight } from 'lucide-react'
+import { CheckCircle, Clock, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
@@ -129,13 +129,7 @@ export function Dashboard() {
       {statsLoading ? (
         <DashboardSkeleton />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard
-            icon={Users}
-            label="Publicadores activos"
-            value={stats?.publicadoresActivos ?? 0}
-            color="bg-blue-100 text-blue-700"
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <StatCard
             icon={CheckCircle}
             label="Asignaciones esta semana"
