@@ -1,4 +1,4 @@
-import { Menu, LogOut, LogIn } from 'lucide-react'
+import { Menu, LogOut } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
@@ -67,12 +67,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               <LogOut className="h-4 w-4" />
             </Button>
           </>
-        ) : (
-          <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
-            <LogIn className="h-4 w-4" />
-            Iniciar sesión
-          </Button>
-        )}
+        ) : null}
       </div>
     </header>
   )
