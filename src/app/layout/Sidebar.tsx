@@ -30,8 +30,9 @@ const NAV_ITEMS: NavItem[] = [
 ]
 
 const ADMIN_ITEMS: NavItem[] = [
-  { to: '/admin',               label: 'Panel',         icon: LayoutGrid },
-  { to: '/admin/publicadores',  label: 'Publicadores',  icon: Users      },
+  { to: '/admin',                              label: 'Panel',                   icon: LayoutGrid },
+  { to: '/admin/publicadores',                 label: 'Publicadores',            icon: Users      },
+  { to: '/admin/configuracion-reuniones',      label: 'Config. reuniones',       icon: Settings   },
 ]
 
 export function Sidebar({ onNavigate }: SidebarProps) {
