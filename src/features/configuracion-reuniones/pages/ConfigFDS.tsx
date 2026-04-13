@@ -1,9 +1,10 @@
+import { Link } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { usePublicadores } from '@/features/publicadores/hooks'
-import { SeccionConfigES } from '../components/SeccionConfigES'
 import { SeccionConfigFDS } from '../components/SeccionConfigFDS'
 import type { PublicadorPublico } from '@/core/supabase/types'
 
-export function ConfiguracionReuniones() {
+export function ConfigFDS() {
   const { data: publicadores = [] } = usePublicadores(true)
 
   const publicadoresPublicos: PublicadorPublico[] = publicadores.map(
@@ -11,17 +12,14 @@ export function ConfiguracionReuniones() {
   )
 
   return (
-    <div className="space-y-10">
-      <div>
-        <h1 className="text-2xl font-bold">Configuración de Reuniones</h1>
-        <p className="text-sm text-muted-foreground">
-          Asigná publicadores a cada parte del programa. Los selectores filtran por cargo elegible.
-        </p>
-      </div>
-
-      <SeccionConfigES publicadores={publicadoresPublicos} />
-
-      <div className="border-t" />
+    <div className="space-y-6">
+      <Link
+        to="/admin/configuracion-reuniones"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Volver a configuración
+      </Link>
 
       <SeccionConfigFDS publicadores={publicadoresPublicos} />
     </div>
