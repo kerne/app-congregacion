@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, ArrowRight } from 'lucide-react'
+import { CheckCircle, Clock, ArrowRight, Pencil } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
@@ -66,7 +66,7 @@ function ProximaAsignacionItem({ a }: { a: AsignacionPersonal }) {
 
 function ProgramaDelDia() {
   const vista    = getVistaSegunDia()
-  const { isAdmin } = useCurrentUser()
+  const { isEditor } = useCurrentUser()
   const semana   = toISODate(getLunesDeSemana(new Date()))
   const fechaFds = toISODate(getProximoDomingo(new Date()))
 
@@ -81,10 +81,20 @@ function ProgramaDelDia() {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <h2 className="text-lg font-semibold">{titulo}</h2>
-        {!isAdmin() && <Badge variant="secondary">Solo lectura</Badge>}
-        <span className="text-sm text-muted-foreground capitalize ml-1">{subtitulo}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-semibold">{titulo}</h2>
+          {!isEditor() && <Badge variant="secondary">Solo lectura</Badge>}
+          <span className="text-sm text-muted-foreground capitalize ml-1">{subtitulo}</span>
+        </div>
+        {isEditor() && (
+          <Button variant="outline" size="sm" asChild>
+            <Link to={vista === 'semana' ? '/programa/entre-semana' : '/programa/fin-de-semana'}>
+              <Pencil className="h-3.5 w-3.5" />
+              Editar
+            </Link>
+          </Button>
+        )}
       </div>
 
       {isLoading ? (

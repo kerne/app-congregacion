@@ -27,7 +27,6 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/',                              label: 'Dashboard',           icon: LayoutDashboard },
   { to: '/entre-semana',                  label: 'Entre semana',        icon: Calendar        },
   { to: '/fin-de-semana',                 label: 'Fin de semana',       icon: Star            },
-  { to: '/admin/configuracion-reuniones', label: 'Config. reuniones',   icon: Settings        },
   { to: '/mis-asignaciones',              label: 'Mis asignaciones',    icon: BookOpen, requiresAuth: true },
 ]
 

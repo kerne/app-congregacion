@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Users, Calendar, Star, Clock, Settings } from 'lucide-react'
+import { Users, Calendar, Star, Clock } from 'lucide-react'
 import { Badge } from '@/shared/components/ui/badge'
 import { useProgramaSemana } from '@/features/programa/semana/hooks'
 import { useProgramaFDS } from '@/features/programa/fds/hooks'
@@ -13,12 +13,6 @@ const CARDS = [
     icon:        Users,
     label:       'Publicadores',
     description: 'Gestionar publicadores, roles y estado',
-  },
-  {
-    to:          '/admin/configuracion-reuniones',
-    icon:        Settings,
-    label:       'Configuración de reuniones',
-    description: 'Asignar publicadores por cargo a cada parte del programa',
   },
   {
     to:          '/entre-semana',

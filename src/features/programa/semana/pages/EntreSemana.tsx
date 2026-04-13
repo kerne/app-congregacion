@@ -25,7 +25,7 @@ export function EntreSemana() {
   const [semana, setSemana] = useState(() => toISODate(getLunesDeSemana(new Date())))
   const [modal, setModal]   = useState<{ parte: ParteSemana; asignacion?: AsignacionSemana } | null>(null)
 
-  const { isAdmin, loading } = useCurrentUser()
+  const { isEditor, loading } = useCurrentUser()
   const { data: asignaciones = [], isLoading, isError, refetch } = useProgramaSemana(semana)
   const { data: publicadores = [] } = usePublicadores(true)
   const upsert  = useUpsertAsignacionSemana()
@@ -45,7 +45,7 @@ export function EntreSemana() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">Reunión Entre Semana</h1>
-            {!loading && !isAdmin() && (
+            {!loading && !isEditor() && (
               <Badge variant="secondary">Solo lectura</Badge>
             )}
           </div>
@@ -73,10 +73,10 @@ export function EntreSemana() {
       ) : (
         <ProgramaSemanaView
           asignaciones={asignaciones}
-          canEdit={isAdmin()}
+          canEdit={isEditor()}
           onEdit={handleEdit}
           emptyMessage={
-            isAdmin()
+            isEditor()
               ? 'No hay asignaciones — empezá asignando partes'
               : 'El programa de esta semana no está disponible aún'
           }

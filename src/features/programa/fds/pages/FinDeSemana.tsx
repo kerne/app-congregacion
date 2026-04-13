@@ -25,7 +25,7 @@ export function FinDeSemana() {
   const [fecha, setFecha] = useState(() => toISODate(getProximoDomingo(new Date())))
   const [modal, setModal] = useState<{ parte: ParteFDS; asignacion?: AsignacionFDS } | null>(null)
 
-  const { isAdmin, loading } = useCurrentUser()
+  const { isEditor, loading } = useCurrentUser()
   const { data: asignaciones = [], isLoading, isError, refetch } = useProgramaFDS(fecha)
   const { data: publicadores = [] } = usePublicadores(true)
   const upsert  = useUpsertAsignacionFDS()
@@ -41,7 +41,7 @@ export function FinDeSemana() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">Reunión Fin de Semana</h1>
-            {!loading && !isAdmin() && (
+            {!loading && !isEditor() && (
               <Badge variant="secondary">Solo lectura</Badge>
             )}
           </div>
@@ -70,10 +70,10 @@ export function FinDeSemana() {
       ) : (
         <ProgramaFDSView
           asignaciones={asignaciones}
-          canEdit={isAdmin()}
+          canEdit={isEditor()}
           onEdit={(parte, asignacion) => setModal({ parte, asignacion })}
           emptyMessage={
-            isAdmin()
+            isEditor()
               ? 'No hay asignaciones — empezá asignando partes'
               : 'El programa de este domingo no está disponible aún'
           }
