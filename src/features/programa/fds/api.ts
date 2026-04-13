@@ -8,10 +8,11 @@ const SELECT_ASIGNACION = `
   asistente:asistente_id (id, nombre, apellido, rol)
 `
 
-export async function getAsignacionesFDS(fecha: string): Promise<AsignacionFDS[]> {
+export async function getAsignacionesFDS(congregacionId: string, fecha: string): Promise<AsignacionFDS[]> {
   const { data, error } = await supabase
     .from('asignaciones_fds')
     .select(SELECT_ASIGNACION)
+    .eq('congregacion_id', congregacionId)
     .eq('fecha', fecha)
 
   if (error) throw error
@@ -19,6 +20,7 @@ export async function getAsignacionesFDS(fecha: string): Promise<AsignacionFDS[]
 }
 
 export async function upsertAsignacionFDS(
+  congregacionId: string,
   fecha: string,
   parteId: string,
   data: AsignacionFormData,
@@ -26,11 +28,12 @@ export async function upsertAsignacionFDS(
 ): Promise<void> {
   const payload = {
     fecha,
-    parte_id:     parteId,
-    asignado_id:  data.asignado_id,
-    asistente_id: data.asistente_id || null,
-    tema:         data.tema || null,
-    modificado:   new Date().toISOString(),
+    parte_id:        parteId,
+    asignado_id:     data.asignado_id,
+    asistente_id:    data.asistente_id || null,
+    tema:            data.tema || null,
+    congregacion_id: congregacionId,
+    modificado:      new Date().toISOString(),
   }
 
   if (asignacionId) {

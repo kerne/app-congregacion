@@ -4,6 +4,7 @@ import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { TableSkeleton } from '@/shared/components/TableSkeleton'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
+import { useMyPublicador } from '@/features/congregacion/useMyPublicador'
 import { useDashboardStats } from '../hooks'
 import { useMisAsignaciones } from '@/features/mis-asignaciones/hooks'
 import { useProgramaSemana } from '@/features/programa/semana/hooks'
@@ -108,17 +109,21 @@ function ProgramaDelDia() {
 }
 
 export function Dashboard() {
-  const { user, publicador, isPublicador } = useCurrentUser()
+  const { user, isPublicador } = useCurrentUser()
+  const { data: myPublicador } = useMyPublicador()
   const { data: stats, isLoading: statsLoading } = useDashboardStats()
-  const { data: proximas = [] } = useMisAsignaciones(publicador?.id)
+  const { data: proximas = [] } = useMisAsignaciones(myPublicador?.id)
 
   const proximasTres = proximas.slice(0, 3)
+  const displayName = myPublicador?.nombre
+    ?? user?.user_metadata?.full_name?.split(' ')[0]
+    ?? user?.email?.split('@')[0]
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">
-          {user ? `Hola, ${publicador?.nombre ?? user.email?.split('@')[0]}` : 'Programa de Reuniones'}
+          {user ? `Hola, ${displayName}` : 'Programa de Reuniones'}
         </h1>
         <p className="text-sm text-muted-foreground">
           Resumen de la congregación
@@ -146,7 +151,7 @@ export function Dashboard() {
       )}
 
       {/* Mis próximas asignaciones — solo para usuarios autenticados */}
-      {isPublicador() && publicador && (
+      {isPublicador() && myPublicador && (
         <div className="rounded-lg border p-5 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold">Tus próximas asignaciones</h2>

@@ -3,13 +3,14 @@ import { getLunesDeSemana, toISODate } from '@/shared/utils/fechas'
 import { PROGRAMA_SEMANA } from '@/core/config/programa-semana'
 import type { DashboardStats } from '@/core/supabase/types'
 
-export async function getDashboardStats(): Promise<DashboardStats> {
+export async function getDashboardStats(congregacionId: string): Promise<DashboardStats> {
   const hoy   = new Date()
   const lunes = toISODate(getLunesDeSemana(hoy))
 
   const { count } = await supabase
     .from('asignaciones_semana')
     .select('id', { count: 'exact', head: true })
+    .eq('congregacion_id', congregacionId)
     .eq('semana', lunes)
 
   const asignacionesEstaSemana = count ?? 0

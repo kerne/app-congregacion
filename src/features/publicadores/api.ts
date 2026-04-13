@@ -12,12 +12,13 @@ export interface CreatePublicadorData {
 
 export interface UpdatePublicadorData extends Partial<CreatePublicadorData> {}
 
-const COLS_PUBLICAS = 'id, nombre, apellido, activo, rol, cargo, creado_en'
+const COLS_PUBLICAS = 'id, nombre, apellido, activo, rol, cargo, congregacion_id, creado_en'
 
-export async function getPublicadores(soloActivos = true): Promise<Publicador[]> {
+export async function getPublicadores(congregacionId: string, soloActivos = true): Promise<Publicador[]> {
   let query = supabase
     .from('publicadores')
     .select(COLS_PUBLICAS)
+    .eq('congregacion_id', congregacionId)
     .order('apellido')
     .order('nombre')
 
@@ -28,10 +29,11 @@ export async function getPublicadores(soloActivos = true): Promise<Publicador[]>
   return data as Publicador[]
 }
 
-export async function getPublicadoresAdmin(soloActivos = true): Promise<Publicador[]> {
+export async function getPublicadoresAdmin(congregacionId: string, soloActivos = true): Promise<Publicador[]> {
   let query = supabase
     .from('publicadores')
     .select('*')
+    .eq('congregacion_id', congregacionId)
     .order('apellido')
     .order('nombre')
 
@@ -42,10 +44,10 @@ export async function getPublicadoresAdmin(soloActivos = true): Promise<Publicad
   return data as Publicador[]
 }
 
-export async function createPublicador(data: CreatePublicadorData): Promise<Publicador> {
+export async function createPublicador(congregacionId: string, data: CreatePublicadorData): Promise<Publicador> {
   const { data: created, error } = await supabase
     .from('publicadores')
-    .insert({ ...data, activo: true })
+    .insert({ ...data, activo: true, congregacion_id: congregacionId })
     .select()
     .single()
 

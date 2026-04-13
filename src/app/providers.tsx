@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { AuthProvider } from '@/features/auth/AuthProvider'
+import { CongregacionProvider } from '@/features/congregacion/CongregacionProvider'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,7 +19,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          {children}
+          <CongregacionProvider>
+            {children}
+          </CongregacionProvider>
         </AuthProvider>
       </BrowserRouter>
       <Toaster richColors position="top-right" />

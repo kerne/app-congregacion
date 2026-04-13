@@ -1,6 +1,27 @@
 export type PublicadorRol = 'publicador' | 'editor' | 'admin'
 
+export type MiembroRol = 'publicador' | 'editor' | 'admin'
+
 export type CargoCongregacion = 'anciano' | 'siervo_ministerial' | 'publicador' | 'publicadora'
+
+export interface Congregacion {
+  id: string
+  nombre: string
+  numero: string | null
+  circuito: string | null
+  creado_por: string | null
+  creado_en: string
+}
+
+export interface Miembro {
+  id: string
+  user_id: string
+  congregacion_id: string
+  rol: MiembroRol
+  activo: boolean
+  creado_en: string
+  congregacion?: Congregacion
+}
 
 export interface Publicador {
   id: string
@@ -11,6 +32,7 @@ export interface Publicador {
   rol: PublicadorRol
   cargo: CargoCongregacion | null
   activo: boolean
+  congregacion_id: string
   creado_en: string
 }
 
@@ -26,6 +48,7 @@ export interface AsignacionSemana {
   tema: string | null
   sala: 'principal' | 'B' | null
   notas: string | null
+  congregacion_id: string
   modificado: string
   asignado?: PublicadorPublico
   asistente?: PublicadorPublico
@@ -39,6 +62,7 @@ export interface AsignacionFDS {
   asistente_id: string | null
   tema: string | null
   notas: string | null
+  congregacion_id: string
   modificado: string
   asignado?: PublicadorPublico
   asistente?: PublicadorPublico

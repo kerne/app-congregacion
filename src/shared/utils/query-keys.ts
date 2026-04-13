@@ -1,18 +1,18 @@
 export const queryKeys = {
   publicadores: {
-    all: ['publicadores'] as const,
-    list: (soloActivos: boolean) => ['publicadores', { soloActivos }] as const,
+    all: (cId: string) => ['publicadores', cId] as const,
+    list: (cId: string, soloActivos: boolean) => ['publicadores', cId, { soloActivos }] as const,
   },
   asignacionesSemana: {
-    semana: (semana: string) => ['asignaciones-semana', semana] as const,
+    semana: (cId: string, semana: string) => ['asignaciones-semana', cId, semana] as const,
   },
   asignacionesFds: {
-    fecha: (fecha: string) => ['asignaciones-fds', fecha] as const,
+    fecha: (cId: string, fecha: string) => ['asignaciones-fds', cId, fecha] as const,
   },
   misAsignaciones: {
-    porPublicador: (id: string) => ['mis-asignaciones', id] as const,
+    porPublicador: (cId: string, id: string) => ['mis-asignaciones', cId, id] as const,
   },
   dashboard: {
-    stats: ['dashboard-stats'] as const,
+    stats: (cId: string) => ['dashboard-stats', cId] as const,
   },
 }

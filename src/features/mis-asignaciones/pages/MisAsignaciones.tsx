@@ -1,7 +1,7 @@
 import { BookOpen } from 'lucide-react'
 import { Badge } from '@/shared/components/ui/badge'
 import { EmptyState } from '@/shared/components/EmptyState'
-import { useCurrentUser } from '@/features/auth/useCurrentUser'
+import { useMyPublicador } from '@/features/congregacion/useMyPublicador'
 import { useMisAsignaciones } from '../hooks'
 import { AsignacionesSkeleton } from '../components/AsignacionesSkeleton'
 import { formatFechaCorta, parseFecha } from '@/shared/utils/fechas'
@@ -30,8 +30,8 @@ function AsignacionCard({ a }: { a: AsignacionPersonal }) {
 }
 
 export function MisAsignaciones() {
-  const { publicador } = useCurrentUser()
-  const { data: asignaciones = [], isLoading } = useMisAsignaciones(publicador?.id)
+  const { data: myPublicador } = useMyPublicador()
+  const { data: asignaciones = [], isLoading } = useMisAsignaciones(myPublicador?.id)
 
   return (
     <div className="space-y-6 max-w-2xl">

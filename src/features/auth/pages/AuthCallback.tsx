@@ -7,18 +7,29 @@ export function AuthCallback() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Con detectSessionInUrl: true (default) + flowType: 'pkce',
-    // Supabase maneja el intercambio del code automáticamente.
-    // Solo escuchamos el evento SIGNED_IN y navegamos.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        const returnTo = sessionStorage.getItem('returnTo') ?? '/'
-        sessionStorage.removeItem('returnTo')
-        navigate(returnTo, { replace: true })
-      }
-    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          // Verificar si tiene congregaciones
+          const { data: miembros } = await supabase
+            .from('miembros')
+            .select('id')
+            .eq('user_id', session.user.id)
+            .eq('activo', true)
+            .limit(1)
 
-    // Fallback: si el intercambio falla, redirigir al login
+          if (!miembros || miembros.length === 0) {
+            navigate('/onboarding', { replace: true })
+            return
+          }
+
+          const returnTo = sessionStorage.getItem('returnTo') ?? '/'
+          sessionStorage.removeItem('returnTo')
+          navigate(returnTo, { replace: true })
+        }
+      },
+    )
+
     const timeout = setTimeout(() => {
       toast.error('No se pudo completar la autenticación')
       navigate('/login', { replace: true })

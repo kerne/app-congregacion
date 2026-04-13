@@ -4,13 +4,14 @@ import { PROGRAMA_SEMANA } from '@/core/config/programa-semana'
 import { PROGRAMA_FDS } from '@/core/config/programa-fds'
 import type { AsignacionPersonal } from '@/core/supabase/types'
 
-export async function getMisAsignaciones(publicadorId: string): Promise<AsignacionPersonal[]> {
+export async function getMisAsignaciones(congregacionId: string, publicadorId: string): Promise<AsignacionPersonal[]> {
   const hoy = toISODate(new Date())
 
   const [semanaRes, fdsRes] = await Promise.all([
     supabase
       .from('asignaciones_semana')
       .select('id, semana, parte_id, asignado_id, asistente_id, tema')
+      .eq('congregacion_id', congregacionId)
       .or(`asignado_id.eq.${publicadorId},asistente_id.eq.${publicadorId}`)
       .gte('semana', hoy)
       .order('semana'),
@@ -18,6 +19,7 @@ export async function getMisAsignaciones(publicadorId: string): Promise<Asignaci
     supabase
       .from('asignaciones_fds')
       .select('id, fecha, parte_id, asignado_id, asistente_id, tema')
+      .eq('congregacion_id', congregacionId)
       .or(`asignado_id.eq.${publicadorId},asistente_id.eq.${publicadorId}`)
       .gte('fecha', hoy)
       .order('fecha'),

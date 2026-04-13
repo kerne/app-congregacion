@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/shared/utils/cn'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
+import { useCongregacion } from '@/features/congregacion/useCongregacion'
 
 interface SidebarProps {
   onNavigate?: () => void
@@ -36,8 +37,9 @@ const ADMIN_ITEMS: NavItem[] = [
 ]
 
 export function Sidebar({ onNavigate }: SidebarProps) {
-  const { rol, user, loading } = useCurrentUser()
-  const isAdmin = !loading && rol === 'admin'
+  const { user, loading } = useCurrentUser()
+  const { congregacion, isAdmin } = useCongregacion()
+  const showAdmin = !loading && isAdmin()
 
   const visibleItems = NAV_ITEMS.filter((item) => {
     if (item.requiresAuth && !user) return false
@@ -46,13 +48,17 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
   return (
     <nav className="flex flex-col h-full">
-      {/* Logo */}
+      {/* Logo + Congregation name */}
       <div className="flex h-16 items-center px-4 border-b">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-xs font-bold text-primary-foreground">C</span>
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+            <span className="text-xs font-bold text-primary-foreground">
+              {congregacion?.nombre?.charAt(0)?.toUpperCase() ?? 'C'}
+            </span>
           </div>
-          <span className="font-semibold text-sm">Congregación</span>
+          <span className="font-semibold text-sm truncate">
+            {congregacion?.nombre ?? 'Congregación'}
+          </span>
         </div>
       </div>
 
@@ -78,7 +84,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
           </NavLink>
         ))}
 
-        {isAdmin && (
+        {showAdmin && (
           <>
             <div className="pt-3 pb-1 px-3">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">

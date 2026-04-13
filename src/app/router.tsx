@@ -3,8 +3,11 @@ import { Routes, Route } from 'react-router-dom'
 import { AppLayout } from './layout/AppLayout'
 import { RequireAuth } from '@/features/auth/RequireAuth'
 import { RequireRole } from '@/features/auth/RequireRole'
+import { RequireCongregacion } from '@/features/congregacion/RequireCongregacion'
 import { Login } from '@/features/auth/pages/Login'
 import { AuthCallback } from '@/features/auth/pages/AuthCallback'
+import { Onboarding } from '@/features/congregacion/pages/Onboarding'
+import { CrearCongregacion } from '@/features/congregacion/pages/CrearCongregacion'
 import { Dashboard } from '@/features/dashboard/pages/Dashboard'
 import { AdminPanel } from '@/features/admin/pages/AdminPanel'
 import { ConfiguracionReunionesIndex } from '@/features/configuracion-reuniones/pages/ConfiguracionReunionesIndex'
@@ -35,8 +38,10 @@ export function AppRouter() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
+      <Route path="/onboarding/crear" element={<RequireAuth><CrearCongregacion /></RequireAuth>} />
 
-      <Route element={<AppLayout />}>
+      <Route element={<RequireCongregacion><AppLayout /></RequireCongregacion>}>
         <Route index element={<Dashboard />} />
         <Route path="entre-semana" element={<EntreSemana />} />
         <Route path="fin-de-semana" element={<FinDeSemana />} />

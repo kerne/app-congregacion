@@ -1,4 +1,4 @@
-import { Menu, LogOut } from 'lucide-react'
+import { Menu, LogOut, LogIn } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
@@ -17,13 +17,14 @@ const ROL_LABELS: Record<string, string> = {
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-  const { user, rol, publicador } = useCurrentUser()
+  const { user, rol } = useCurrentUser()
   const navigate = useNavigate()
 
   async function handleLogout() {
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
+      localStorage.removeItem('congregacion_activa')
       toast.success('Sesión cerrada')
       navigate('/login')
     } catch (err) {
@@ -32,9 +33,9 @@ export function Header({ onMenuClick }: HeaderProps) {
     }
   }
 
-  const displayName = publicador
-    ? `${publicador.nombre} ${publicador.apellido}`
-    : user?.email ?? 'Visitante'
+  const displayName = user?.user_metadata?.full_name
+    ?? user?.email
+    ?? 'Visitante'
 
   return (
     <header className="flex h-16 items-center justify-between border-b bg-white px-4 gap-4">
@@ -67,7 +68,12 @@ export function Header({ onMenuClick }: HeaderProps) {
               <LogOut className="h-4 w-4" />
             </Button>
           </>
-        ) : null}
+        ) : (
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate('/login')}>
+            <LogIn className="h-4 w-4" />
+            Iniciar sesión
+          </Button>
+        )}
       </div>
     </header>
   )
