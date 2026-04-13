@@ -34,10 +34,11 @@ DELETE FROM congregaciones WHERE numero = 'SEED';
 -- 1b. CONGREGACIÓN SEED
 -- ------------------------------------------------------------
 
-INSERT INTO congregaciones (id, nombre, numero, circuito)
+INSERT INTO congregaciones (id, nombre, slug, numero, circuito)
 VALUES (
   'c0000001-0000-0000-0000-000000000001',
   'Congregación Seed',
+  'congregacion-seed',
   'SEED',
   'AR-01'
 );

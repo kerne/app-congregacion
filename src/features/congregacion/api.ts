@@ -3,6 +3,7 @@ import type { Congregacion } from '@/core/supabase/types'
 
 export interface CreateCongregacionData {
   nombre: string
+  slug: string
   numero?: string | null
   circuito?: string | null
 }
@@ -18,6 +19,7 @@ export async function crearCongregacion(
     .from('congregaciones')
     .insert({
       nombre: data.nombre,
+      slug: data.slug,
       numero: data.numero || null,
       circuito: data.circuito || null,
       creado_por: user.id,

@@ -106,6 +106,7 @@ ALTER TABLE publicadores
 CREATE TABLE congregaciones (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   nombre     TEXT NOT NULL,
+  slug       TEXT NOT NULL UNIQUE,
   numero     TEXT,
   circuito   TEXT,
   creado_por UUID REFERENCES auth.users(id),
@@ -113,6 +114,7 @@ CREATE TABLE congregaciones (
 );
 
 CREATE INDEX idx_congregaciones_creado_por ON congregaciones(creado_por);
+CREATE INDEX idx_congregaciones_slug ON congregaciones(slug);
 
 -- Tabla miembros
 CREATE TABLE miembros (
@@ -213,6 +215,11 @@ CREATE POLICY "cong_update_admin"
   USING (get_user_rol_en(id) = 'admin')
   WITH CHECK (get_user_rol_en(id) = 'admin');
 
+CREATE POLICY "cong_select_anon"
+  ON congregaciones FOR SELECT
+  TO anon
+  USING (true);
+
 -- ============================================================
 -- RLS — miembros
 -- ============================================================
@@ -269,6 +276,11 @@ CREATE POLICY "pub_update_admin_congregacion"
   USING (get_user_rol_en(congregacion_id) = 'admin')
   WITH CHECK (get_user_rol_en(congregacion_id) = 'admin');
 
+CREATE POLICY "pub_select_anon"
+  ON publicadores FOR SELECT
+  TO anon
+  USING (activo = true);
+
 -- ============================================================
 -- RLS — asignaciones_semana
 -- ============================================================
@@ -293,6 +305,11 @@ CREATE POLICY "asig_sem_delete_congregacion"
   ON asignaciones_semana FOR DELETE
   USING (get_user_rol_en(congregacion_id) IN ('editor', 'admin'));
 
+CREATE POLICY "asig_sem_select_anon"
+  ON asignaciones_semana FOR SELECT
+  TO anon
+  USING (true);
+
 -- ============================================================
 -- RLS — asignaciones_fds
 -- ============================================================
@@ -316,3 +333,8 @@ CREATE POLICY "asig_fds_update_congregacion"
 CREATE POLICY "asig_fds_delete_congregacion"
   ON asignaciones_fds FOR DELETE
   USING (get_user_rol_en(congregacion_id) IN ('editor', 'admin'));
+
+CREATE POLICY "asig_fds_select_anon"
+  ON asignaciones_fds FOR SELECT
+  TO anon
+  USING (true);

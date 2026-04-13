@@ -9,6 +9,7 @@ import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { ArrowLeft } from 'lucide-react'
 import { crearCongregacion } from '@/features/congregacion/api'
+import { slugify } from '@/shared/utils/slugify'
 
 const schema = z.object({
   nombre: z.string().min(2, 'El nombre es obligatorio'),
@@ -35,6 +36,7 @@ export function CrearCongregacion() {
     try {
       await crearCongregacion({
         nombre: data.nombre,
+        slug: slugify(data.nombre),
         numero: data.numero || null,
         circuito: data.circuito || null,
       })

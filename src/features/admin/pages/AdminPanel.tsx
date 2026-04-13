@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
-import { Users, Calendar, Star, Clock } from 'lucide-react'
+import { Users, Calendar, Star, Clock, Link2 } from 'lucide-react'
 import { Badge } from '@/shared/components/ui/badge'
+import { Button } from '@/shared/components/ui/button'
+import { useCongregacion } from '@/features/congregacion/useCongregacion'
+import { toast } from 'sonner'
 import { useProgramaSemana } from '@/features/programa/semana/hooks'
 import { useProgramaFDS } from '@/features/programa/fds/hooks'
 import { PROGRAMA_SEMANA } from '@/core/config/programa-semana'
@@ -29,6 +32,7 @@ const CARDS = [
 ]
 
 export function AdminPanel() {
+  const { congregacion } = useCongregacion()
   const semanaActual   = toISODate(getLunesDeSemana(new Date()))
   const proximoDomingo = toISODate(getProximoDomingo(new Date()))
 
@@ -95,6 +99,36 @@ export function AdminPanel() {
           </Link>
         ))}
       </div>
+
+      {/* Link público */}
+      {congregacion?.slug && (
+        <div className="rounded-lg border p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <Link2 className="h-4 w-4 text-muted-foreground" />
+            <h2 className="font-semibold text-sm">Link público</h2>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Compartí este link para que los publicadores vean el programa sin necesidad de registrarse.
+          </p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 text-xs bg-muted px-3 py-2 rounded-md truncate">
+              {`${window.location.origin}/c/${congregacion.slug}/entre-semana`}
+            </code>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `${window.location.origin}/c/${congregacion.slug}/entre-semana`
+                )
+                toast.success('Link copiado al portapapeles')
+              }}
+            >
+              Copiar
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

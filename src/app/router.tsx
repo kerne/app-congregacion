@@ -14,6 +14,9 @@ import { EntreSemana } from '@/features/programa/semana/pages/EntreSemana'
 import { FinDeSemana } from '@/features/programa/fds/pages/FinDeSemana'
 import { MisAsignaciones } from '@/features/mis-asignaciones/pages/MisAsignaciones'
 import { PublicadoresSkeleton } from '@/features/publicadores/components/PublicadoresSkeleton'
+import { PublicLayout, PublicSlugRedirect } from './layout/PublicLayout'
+import { PublicEntreSemana } from '@/features/programa/semana/pages/PublicEntreSemana'
+import { PublicFinDeSemana } from '@/features/programa/fds/pages/PublicFinDeSemana'
 
 const Publicadores = lazy(() =>
   import('@/features/publicadores/pages/Publicadores').then((m) => ({ default: m.Publicadores }))
@@ -68,6 +71,13 @@ export function AppRouter() {
             </RequireRole>
           }
         />
+      </Route>
+
+      {/* Public programa routes */}
+      <Route path="c/:slug" element={<PublicLayout />}>
+        <Route index element={<PublicSlugRedirect />} />
+        <Route path="entre-semana" element={<PublicEntreSemana />} />
+        <Route path="fin-de-semana" element={<PublicFinDeSemana />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

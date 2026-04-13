@@ -7,6 +7,7 @@ export type CargoCongregacion = 'anciano' | 'siervo_ministerial' | 'publicador' 
 export interface Congregacion {
   id: string
   nombre: string
+  slug: string
   numero: string | null
   circuito: string | null
   creado_por: string | null
