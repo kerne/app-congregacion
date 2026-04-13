@@ -1,133 +1,66 @@
-import { CheckCircle, Clock, ArrowRight, Pencil } from 'lucide-react'
+import { Calendar, Star, BookOpen, Users, LayoutGrid } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
-import { TableSkeleton } from '@/shared/components/TableSkeleton'
 import { useCurrentUser } from '@/features/auth/useCurrentUser'
 import { useMyPublicador } from '@/features/congregacion/useMyPublicador'
-import { useDashboardStats } from '../hooks'
-import { useMisAsignaciones } from '@/features/mis-asignaciones/hooks'
-import { useProgramaSemana } from '@/features/programa/semana/hooks'
-import { useProgramaFDS } from '@/features/programa/fds/hooks'
-import { ProgramaSemanaView } from '@/features/programa/semana/components/ProgramaSemanaView'
-import { ProgramaFDSView } from '@/features/programa/fds/components/ProgramaFDSView'
-import {
-  getLunesDeSemana,
-  getProximoDomingo,
-  toISODate,
-  formatRangoSemana,
-  formatDomingo,
-  formatFechaCorta,
-  parseFecha,
-} from '@/shared/utils/fechas'
-import { DashboardSkeleton } from '../components/DashboardSkeleton'
-import type { AsignacionPersonal } from '@/core/supabase/types'
 
-function getVistaSegunDia(): 'semana' | 'fds' {
-  const dia = new Date().getDay()
-  return dia === 0 || dia === 6 ? 'fds' : 'semana'
-}
-
-function StatCard({ icon: Icon, label, value, color }: {
+interface QuickCard {
+  to: string
   icon: React.ElementType
   label: string
-  value: number | string
-  color: string
-}) {
-  return (
-    <div className="rounded-lg border bg-card p-5 flex items-center gap-4">
-      <div className={`rounded-full p-2.5 ${color}`}>
-        <Icon className="h-5 w-5" />
-      </div>
-      <div>
-        <p className="text-2xl font-bold">{value}</p>
-        <p className="text-sm text-muted-foreground">{label}</p>
-      </div>
-    </div>
-  )
+  description: string
+  role?: 'auth' | 'admin'
 }
 
-function ProximaAsignacionItem({ a }: { a: AsignacionPersonal }) {
-  return (
-    <div className="flex items-center justify-between py-2.5 border-b last:border-0">
-      <div>
-        <p className="text-sm font-medium">{a.parte_nombre}</p>
-        <p className="text-xs text-muted-foreground capitalize">
-          {a.tipo === 'semana' ? 'Entre semana' : 'Fin de semana'}
-          {a.rol === 'asistente' && ' · Asistente'}
-        </p>
-      </div>
-      <span className="text-sm text-muted-foreground shrink-0 ml-2">
-        {formatFechaCorta(parseFecha(a.fecha))}
-      </span>
-    </div>
-  )
-}
-
-function ProgramaDelDia() {
-  const vista    = getVistaSegunDia()
-  const { isEditor } = useCurrentUser()
-  const semana   = toISODate(getLunesDeSemana(new Date()))
-  const fechaFds = toISODate(getProximoDomingo(new Date()))
-
-  const semanaQuery = useProgramaSemana(semana)
-  const fdsQuery    = useProgramaFDS(fechaFds)
-
-  const isLoading = vista === 'semana' ? semanaQuery.isLoading : fdsQuery.isLoading
-  const titulo    = vista === 'semana' ? 'Reunión Entre Semana' : 'Reunión Fin de Semana'
-  const subtitulo = vista === 'semana'
-    ? formatRangoSemana(parseFecha(semana))
-    : formatDomingo(parseFecha(fechaFds))
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold">{titulo}</h2>
-          {!isEditor() && <Badge variant="secondary">Solo lectura</Badge>}
-          <span className="text-sm text-muted-foreground capitalize ml-1">{subtitulo}</span>
-        </div>
-        {isEditor() && (
-          <Button variant="outline" size="sm" asChild>
-            <Link to={vista === 'semana' ? '/programa/entre-semana' : '/programa/fin-de-semana'}>
-              <Pencil className="h-3.5 w-3.5" />
-              Editar
-            </Link>
-          </Button>
-        )}
-      </div>
-
-      {isLoading ? (
-        <TableSkeleton rows={vista === 'semana' ? 8 : 5} cols={3} />
-      ) : vista === 'semana' ? (
-        <ProgramaSemanaView
-          asignaciones={semanaQuery.data ?? []}
-          canEdit={false}
-          onEdit={() => {}}
-          emptyMessage="El programa de esta semana no está disponible aún"
-        />
-      ) : (
-        <ProgramaFDSView
-          asignaciones={fdsQuery.data ?? []}
-          canEdit={false}
-          onEdit={() => {}}
-          emptyMessage="El programa de este fin de semana no está disponible aún"
-        />
-      )}
-    </div>
-  )
-}
+const QUICK_CARDS: QuickCard[] = [
+  {
+    to: '/entre-semana',
+    icon: Calendar,
+    label: 'Entre Semana',
+    description: 'Programa de la reunión entre semana',
+  },
+  {
+    to: '/fin-de-semana',
+    icon: Star,
+    label: 'Fin de Semana',
+    description: 'Programa de la reunión de fin de semana',
+  },
+  {
+    to: '/mis-asignaciones',
+    icon: BookOpen,
+    label: 'Mis Asignaciones',
+    description: 'Consultá tus próximas asignaciones',
+    role: 'auth',
+  },
+  {
+    to: '/admin/publicadores',
+    icon: Users,
+    label: 'Publicadores',
+    description: 'Gestionar publicadores, roles y estado',
+    role: 'admin',
+  },
+  {
+    to: '/admin',
+    icon: LayoutGrid,
+    label: 'Administración',
+    description: 'Panel de administración de la congregación',
+    role: 'admin',
+  },
+]
 
 export function Dashboard() {
-  const { user, isPublicador } = useCurrentUser()
+  const { user, isAdmin } = useCurrentUser()
   const { data: myPublicador } = useMyPublicador()
-  const { data: stats, isLoading: statsLoading } = useDashboardStats()
-  const { data: proximas = [] } = useMisAsignaciones(myPublicador?.id)
 
-  const proximasTres = proximas.slice(0, 3)
   const displayName = myPublicador?.nombre
     ?? user?.user_metadata?.full_name?.split(' ')[0]
     ?? user?.email?.split('@')[0]
+
+  const visibleCards = QUICK_CARDS.filter((card) => {
+    if (card.role === 'auth' && !user) return false
+    if (card.role === 'admin' && !isAdmin()) return false
+    return true
+  })
 
   return (
     <div className="space-y-6">
@@ -140,52 +73,28 @@ export function Dashboard() {
         </p>
       </div>
 
-      {/* Stats */}
-      {statsLoading ? (
-        <DashboardSkeleton />
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <StatCard
-            icon={CheckCircle}
-            label="Asignaciones esta semana"
-            value={stats?.asignacionesEstaSemana ?? 0}
-            color="bg-emerald-100 text-emerald-700"
-          />
-          <StatCard
-            icon={Clock}
-            label="Partes pendientes"
-            value={stats?.partesPendientesEstaSemana ?? 0}
-            color="bg-amber-100 text-amber-700"
-          />
-        </div>
-      )}
-
-      {/* Mis próximas asignaciones — solo para usuarios autenticados */}
-      {isPublicador() && myPublicador && (
-        <div className="rounded-lg border p-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Tus próximas asignaciones</h2>
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/mis-asignaciones">
-                Ver todas
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
-          </div>
-          {proximasTres.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No tenés asignaciones próximas</p>
-          ) : (
-            <div>
-              {proximasTres.map((a) => (
-                <ProximaAsignacionItem key={`${a.tipo}-${a.id}`} a={a} />
-              ))}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {visibleCards.map(({ to, icon: Icon, label, description, role }) => (
+          <Link
+            key={to}
+            to={to}
+            className="group flex flex-col gap-3 rounded-lg border p-5 transition-colors hover:bg-accent hover:border-accent-foreground/20"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Icon className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-sm">{label}</span>
+                {role === 'admin' && (
+                  <Badge variant="secondary" className="text-[10px] h-4">Admin</Badge>
+                )}
+              </div>
             </div>
-          )}
-        </div>
-      )}
-
-      {/* Programa del día */}
-      <ProgramaDelDia />
+            <p className="text-sm text-muted-foreground">{description}</p>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }
