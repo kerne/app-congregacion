@@ -17,14 +17,12 @@ export function PublicadorSelector({
   onChange,
   placeholder = 'Seleccionar publicador...',
   disabled,
-  cargosFiltro,
+  cargosFiltro: _cargosFiltro,
 }: PublicadorSelectorProps) {
+  // TODO: rehabilitar filtro por cargo cuando todos los publicadores tengan cargo asignado
   const items = useMemo(() => {
-    const filtrados = cargosFiltro && cargosFiltro.length > 0
-      ? publicadores.filter((p) => p.cargo !== null && cargosFiltro.includes(p.cargo as CargoCongregacion))
-      : publicadores
-    return filtrados.map((p) => ({ id: p.id, label: `${p.nombre} ${p.apellido}` }))
-  }, [publicadores, cargosFiltro])
+    return publicadores.map((p) => ({ id: p.id, label: `${p.nombre} ${p.apellido}` }))
+  }, [publicadores])
 
   return (
     <Select value={value} onValueChange={onChange} disabled={disabled}>
