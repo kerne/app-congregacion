@@ -68,7 +68,7 @@ export function ProgramaFDSView({ asignaciones, canEdit, onEdit, emptyMessage }:
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-1.5 text-sm">
                             <UserCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            {asignacion.asignado?.nombre} {asignacion.asignado?.apellido}
+                            {asignacion.asignado?.apellido}, {asignacion.asignado?.nombre}
                           </div>
                           {asignacion.tema && (
                             <div className="text-xs text-muted-foreground italic">

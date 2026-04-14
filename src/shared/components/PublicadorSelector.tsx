@@ -21,7 +21,7 @@ export function PublicadorSelector({
 }: PublicadorSelectorProps) {
   // TODO: rehabilitar filtro por cargo cuando todos los publicadores tengan cargo asignado
   const items = useMemo(() => {
-    return publicadores.map((p) => ({ id: p.id, label: `${p.nombre} ${p.apellido}` }))
+    return publicadores.map((p) => ({ id: p.id, label: `${p.apellido}, ${p.nombre}` }))
   }, [publicadores])
 
   return (

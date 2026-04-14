@@ -47,7 +47,7 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteR
             <div className="flex items-center gap-1.5 text-sm">
               <UserCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
               <span>
-                {asignacion.asignado?.nombre} {asignacion.asignado?.apellido}
+                {asignacion.asignado?.apellido}, {asignacion.asignado?.nombre}
               </span>
               {asignacion.sala === 'B' && (
                 <Badge variant="outline" className="text-xs h-4">Sala B</Badge>
@@ -56,7 +56,7 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteR
             {asignacion.asistente && (
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <UserCircle className="h-3 w-3 shrink-0" />
-                Asistente: {asignacion.asistente.nombre} {asignacion.asistente.apellido}
+                Asistente: {asignacion.asistente.apellido}, {asignacion.asistente.nombre}
               </div>
             )}
             {asignacion.tema && (

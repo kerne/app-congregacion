@@ -291,7 +291,7 @@ export function Publicadores() {
             <tbody>
               {publicadoresFiltrados.map((p) => (
                 <tr key={p.id} className="border-t hover:bg-muted/30 transition-colors">
-                  <td className="p-3 font-medium">{p.nombre} {p.apellido}</td>
+                  <td className="p-3 font-medium">{p.apellido}, {p.nombre}</td>
                   <td className="p-3 text-muted-foreground hidden sm:table-cell">{p.email}</td>
                   <td className="p-3 hidden md:table-cell">
                     {p.cargo ? (
