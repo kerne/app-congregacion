@@ -18,19 +18,20 @@ const AM: CargoCongregacion[] = ['anciano', 'siervo_ministerial']
 const TODOS: CargoCongregacion[] = ['anciano', 'siervo_ministerial', 'publicador', 'publicadora']
 
 export const PROGRAMA_SEMANA: ParteSemana[] = [
-  { id: 'presidente',           nombre: 'Presidente',                        seccion: 'apertura', tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 0,  cargosPermitidos: AM    },
-  { id: 'lector_tesoros',       nombre: 'Lector (Tesoros)',                   seccion: 'apertura', tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 0,  cargosPermitidos: AM    },
+  { id: 'presidente',           nombre: 'Presidente',                        seccion: 'apertura', tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 1,  cargosPermitidos: AM    },
   { id: 'discurso_tesoros',     nombre: 'Discurso',                           seccion: 'tesoros',  tieneAsistente: false, tieneTema: true,  tieneSala: false, opcional: false, duracionMin: 10, cargosPermitidos: AM    },
-  { id: 'mejores_maestros',     nombre: 'Seamos Mejores Maestros',            seccion: 'tesoros',  tieneAsistente: false, tieneTema: true,  tieneSala: false, opcional: false, duracionMin: 8,  cargosPermitidos: AM    },
-  { id: 'busqueda_tesoros',     nombre: 'Búsqueda de Tesoros Bíblicos',       seccion: 'tesoros',  tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 10, cargosPermitidos: AM    },
+  { id: 'busqueda_tesoros',     nombre: 'Busquemos Perlas Escondidas',        seccion: 'tesoros',  tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 10, cargosPermitidos: AM    },
+  { id: 'lectura_biblia',       nombre: 'Lectura de la Biblia',               seccion: 'tesoros',  tieneAsistente: false, tieneTema: true,  tieneSala: true,  opcional: false, duracionMin: 4,  cargosPermitidos: TODOS },
   { id: 'smt_parte1',           nombre: 'Parte de Estudiantes 1',             seccion: 'smt',      tieneAsistente: true,  tieneTema: true,  tieneSala: true,  opcional: false, duracionMin: 4,  cargosPermitidos: TODOS },
   { id: 'smt_parte2',           nombre: 'Parte de Estudiantes 2',             seccion: 'smt',      tieneAsistente: true,  tieneTema: true,  tieneSala: true,  opcional: false, duracionMin: 4,  cargosPermitidos: TODOS },
   { id: 'smt_parte3',           nombre: 'Parte de Estudiantes 3',             seccion: 'smt',      tieneAsistente: true,  tieneTema: true,  tieneSala: true,  opcional: true,  duracionMin: 4,  cargosPermitidos: TODOS },
   { id: 'smt_parte4',           nombre: 'Parte de Estudiantes 4',             seccion: 'smt',      tieneAsistente: true,  tieneTema: true,  tieneSala: true,  opcional: true,  duracionMin: 4,  cargosPermitidos: TODOS },
-  { id: 'nvc_parte1',           nombre: 'Parte Vida Cristiana 1',             seccion: 'nvc',      tieneAsistente: false, tieneTema: true,  tieneSala: false, opcional: false, duracionMin: 10, cargosPermitidos: AM    },
-  { id: 'nvc_parte2',           nombre: 'Parte Vida Cristiana 2',             seccion: 'nvc',      tieneAsistente: false, tieneTema: true,  tieneSala: false, opcional: true,  duracionMin: 10, cargosPermitidos: AM    },
+  { id: 'nvc_parte1',           nombre: 'Parte Vida Cristiana 1',             seccion: 'nvc',      tieneAsistente: false, tieneTema: true,  tieneSala: false, opcional: false, duracionMin: 15, cargosPermitidos: AM    },
+  { id: 'nvc_parte2',           nombre: 'Parte Vida Cristiana 2',             seccion: 'nvc',      tieneAsistente: false, tieneTema: true,  tieneSala: false, opcional: true,  duracionMin: 15, cargosPermitidos: AM    },
+  { id: 'lector_estudio',       nombre: 'Lector del Estudio Bíblico',         seccion: 'nvc',      tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 0,  cargosPermitidos: AM    },
   { id: 'estudio_congregacion', nombre: 'Estudio Bíblico de la Congregación', seccion: 'nvc',      tieneAsistente: false, tieneTema: true,  tieneSala: false, opcional: false, duracionMin: 30, cargosPermitidos: ['anciano'] },
-  { id: 'cierre',               nombre: 'Cierre (Presidente)',                seccion: 'cierre',   tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 0,  cargosPermitidos: AM    },
+  { id: 'cierre',               nombre: 'Cierre (Presidente)',                seccion: 'cierre',   tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 3,  cargosPermitidos: AM    },
+  { id: 'oracion_final',        nombre: 'Oración Final',                      seccion: 'cierre',   tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 0,  cargosPermitidos: AM    },
 ]
 
 export const SECCION_NOMBRES: Record<SeccionSemana, string> = {

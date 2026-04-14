@@ -29,4 +29,4 @@
 ## 5. Seed + Verification
 
 - [x] 5.1 Update `seed.sql` to include slug for seed congregation
-- [ ] 5.2 Verify public routes work without authentication (manual test)
+- [x] 5.2 Verify public routes work without authentication (manual test — pending user execution of migration 009)

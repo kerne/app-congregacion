@@ -3,8 +3,8 @@
  * Inserta los publicadores desde supabase/publicadores.txt en Supabase.
  *
  * Uso:
- *   npx tsx supabase/scripts/seed-publicadores.ts           # insert real
- *   npx tsx supabase/scripts/seed-publicadores.ts --dry-run # solo imprime, no inserta
+ *   npx tsx supabase/scripts/seed-publicadores.ts --congregacion-id <uuid>           # insert real
+ *   npx tsx supabase/scripts/seed-publicadores.ts --congregacion-id <uuid> --dry-run # solo imprime, no inserta
  *
  * Variables de entorno requeridas (en .env.local):
  *   VITE_SUPABASE_URL          — URL del proyecto Supabase
@@ -39,6 +39,15 @@ const SUPABASE_URL = env['VITE_SUPABASE_URL'] ?? env['SUPABASE_URL'] ?? ''
 const SERVICE_KEY  = env['SUPABASE_SERVICE_ROLE_KEY'] ?? ''
 
 const isDryRun = process.argv.includes('--dry-run')
+
+const congIdIdx = process.argv.indexOf('--congregacion-id')
+const CONGREGACION_ID = congIdIdx !== -1 ? process.argv[congIdIdx + 1] : ''
+
+if (!CONGREGACION_ID) {
+  console.error('❌ Falta --congregacion-id <uuid>')
+  console.error('   Ejemplo: npx tsx supabase/scripts/seed-publicadores.ts --congregacion-id c263174d-...')
+  process.exit(1)
+}
 
 if (!isDryRun && (!SUPABASE_URL || !SERVICE_KEY)) {
   console.error('❌ Faltan variables de entorno:')
@@ -102,7 +111,7 @@ let errores    = 0
 for (const { nombre, apellido } of publicadores) {
   const { error } = await supabase
     .from('publicadores')
-    .insert({ nombre, apellido, rol: 'publicador', activo: true })
+    .insert({ nombre, apellido, rol: 'publicador', activo: true, congregacion_id: CONGREGACION_ID })
 
   if (error) {
     console.error(`  ✗ ${apellido} ${nombre}: ${error.message}`)
