@@ -7,25 +7,34 @@ export function AuthCallback() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    async function handleSignIn(userId: string) {
+      const { data: miembros } = await supabase
+        .from('miembros')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('activo', true)
+        .limit(1)
+
+      if (!miembros || miembros.length === 0) {
+        navigate('/onboarding', { replace: true })
+        return
+      }
+
+      const returnTo = sessionStorage.getItem('returnTo') ?? '/'
+      sessionStorage.removeItem('returnTo')
+      navigate(returnTo, { replace: true })
+    }
+
+    // La sesión puede ya existir si Supabase hizo el exchange antes de que
+    // montara el componente — en ese caso onAuthStateChange nunca dispara SIGNED_IN
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) handleSignIn(session.user.id)
+    })
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (event === 'SIGNED_IN' && session) {
-          // Verificar si tiene congregaciones
-          const { data: miembros } = await supabase
-            .from('miembros')
-            .select('id')
-            .eq('user_id', session.user.id)
-            .eq('activo', true)
-            .limit(1)
-
-          if (!miembros || miembros.length === 0) {
-            navigate('/onboarding', { replace: true })
-            return
-          }
-
-          const returnTo = sessionStorage.getItem('returnTo') ?? '/'
-          sessionStorage.removeItem('returnTo')
-          navigate(returnTo, { replace: true })
+          handleSignIn(session.user.id)
         }
       },
     )
