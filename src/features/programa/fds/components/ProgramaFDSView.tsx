@@ -76,9 +76,9 @@ export function ProgramaFDSView({ asignaciones, canEdit, onEdit, emptyMessage }:
                             </div>
                           )}
                         </div>
-                      ) : (
+                      ) : canEdit ? (
                         <Badge variant="warning" className="text-xs">Pendiente</Badge>
-                      )}
+                      ) : null}
                     </td>
                     {canEdit && (
                       <td className="px-4 py-2.5 text-right">

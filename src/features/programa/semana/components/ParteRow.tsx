@@ -65,9 +65,9 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteR
               </div>
             )}
           </div>
-        ) : (
+        ) : canEdit ? (
           <Badge variant="warning" className="text-xs">Pendiente</Badge>
-        )}
+        ) : null}
       </td>
 
       {/* Acciones */}
