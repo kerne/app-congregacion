@@ -38,6 +38,11 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteR
             </span>
           )}
         </div>
+        {asignacion?.tema && (
+          <div className="text-xs italic text-foreground/75 mt-0.5">
+            "{asignacion.tema}"
+          </div>
+        )}
       </td>
 
       {/* Asignado */}
@@ -57,11 +62,6 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteR
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <UserCircle className="h-3 w-3 shrink-0" />
                 Asistente: {asignacion.asistente.apellido}, {asignacion.asistente.nombre}
-              </div>
-            )}
-            {asignacion.tema && (
-              <div className="text-xs text-muted-foreground italic">
-                "{asignacion.tema}"
               </div>
             )}
           </div>
