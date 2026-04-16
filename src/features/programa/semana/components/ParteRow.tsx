@@ -60,7 +60,7 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteR
               </div>
             )}
             {asignacion.tema && (
-              <div className="text-xs text-muted-foreground italic truncate max-w-[200px]">
+              <div className="text-xs text-muted-foreground italic">
                 "{asignacion.tema}"
               </div>
             )}
