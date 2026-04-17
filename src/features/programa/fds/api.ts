@@ -29,7 +29,8 @@ export async function upsertAsignacionFDS(
   const payload = {
     fecha,
     parte_id:        parteId,
-    asignado_id:     data.asignado_id,
+    asignado_id:     data.asignado_id || null,
+    orador_nombre:   data.orador_nombre || null,
     asistente_id:    data.asistente_id || null,
     tema:            data.tema || null,
     congregacion_id: congregacionId,

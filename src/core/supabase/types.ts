@@ -59,8 +59,9 @@ export interface AsignacionFDS {
   id: string
   fecha: string // YYYY-MM-DD domingo
   parte_id: string
-  asignado_id: string
+  asignado_id: string | null
   asistente_id: string | null
+  orador_nombre: string | null
   tema: string | null
   notas: string | null
   congregacion_id: string

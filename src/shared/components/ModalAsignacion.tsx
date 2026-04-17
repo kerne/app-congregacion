@@ -14,11 +14,15 @@ import type { ParteFDS } from '@/core/config/programa-fds'
 import type { CargoCongregacion, PublicadorPublico } from '@/core/supabase/types'
 
 const schema = z.object({
-  asignado_id:  z.string().min(1, 'Requerido'),
-  asistente_id: z.string().optional(),
-  tema:         z.string().optional(),
-  sala:         z.enum(['principal', 'B']).optional(),
-})
+  asignado_id:   z.string().optional(),
+  orador_nombre: z.string().optional(),
+  asistente_id:  z.string().optional(),
+  tema:          z.string().optional(),
+  sala:          z.enum(['principal', 'B']).optional(),
+}).refine(
+  (d) => d.asignado_id || d.orador_nombre,
+  { message: 'Requerido', path: ['orador_nombre'] },
+)
 
 export type AsignacionFormData = z.infer<typeof schema>
 
@@ -26,7 +30,13 @@ interface ModalAsignacionProps {
   open: boolean
   onClose: () => void
   parte: ParteSemana | ParteFDS
-  asignacionActual?: { asignado_id: string; asistente_id?: string | null; tema?: string | null; sala?: string | null }
+  asignacionActual?: {
+    asignado_id?: string | null
+    asistente_id?: string | null
+    orador_nombre?: string | null
+    tema?: string | null
+    sala?: string | null
+  }
   publicadores: PublicadorPublico[]
   onSave: (data: AsignacionFormData) => Promise<void>
   onDelete?: () => Promise<void>
@@ -47,17 +57,19 @@ export function ModalAsignacion({
   isDeleting,
   cargosAsistente,
 }: ModalAsignacionProps) {
+  const tieneOradorManual = 'tieneOradorManual' in parte ? parte.tieneOradorManual : false
+  const tieneSala = 'tieneSala' in parte ? parte.tieneSala : false
+
   const { control, handleSubmit, formState: { errors }, reset } = useForm<AsignacionFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      asignado_id:  asignacionActual?.asignado_id ?? '',
-      asistente_id: asignacionActual?.asistente_id ?? undefined,
-      tema:         asignacionActual?.tema ?? undefined,
-      sala:         (asignacionActual?.sala as 'principal' | 'B' | undefined) ?? undefined,
+      asignado_id:   asignacionActual?.asignado_id ?? undefined,
+      orador_nombre: asignacionActual?.orador_nombre ?? undefined,
+      asistente_id:  asignacionActual?.asistente_id ?? undefined,
+      tema:          asignacionActual?.tema ?? undefined,
+      sala:          (asignacionActual?.sala as 'principal' | 'B' | undefined) ?? undefined,
     },
   })
-
-  const tieneSala = 'tieneSala' in parte ? parte.tieneSala : false
 
   const onSubmit = useCallback(async (data: AsignacionFormData) => {
     await onSave(data)
@@ -80,25 +92,46 @@ export function ModalAsignacion({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Asignado */}
-          <div className="space-y-1.5">
-            <Label>Publicador *</Label>
-            <Controller
-              control={control}
-              name="asignado_id"
-              render={({ field }) => (
-                <PublicadorSelector
-                  publicadores={publicadores}
-                  value={field.value}
-                  onChange={field.onChange}
-                  cargosFiltro={parte.cargosPermitidos}
-                />
+          {/* Orador manual (solo para fds_orador) */}
+          {tieneOradorManual ? (
+            <div className="space-y-1.5">
+              <Label>Orador *</Label>
+              <Controller
+                control={control}
+                name="orador_nombre"
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    value={field.value ?? ''}
+                    placeholder="Nombre del orador..."
+                  />
+                )}
+              />
+              {errors.orador_nombre && (
+                <p className="text-xs text-destructive">{errors.orador_nombre.message}</p>
               )}
-            />
-            {errors.asignado_id && (
-              <p className="text-xs text-destructive">{errors.asignado_id.message}</p>
-            )}
-          </div>
+            </div>
+          ) : (
+            /* Selector de publicadores para todas las demás partes */
+            <div className="space-y-1.5">
+              <Label>Publicador *</Label>
+              <Controller
+                control={control}
+                name="asignado_id"
+                render={({ field }) => (
+                  <PublicadorSelector
+                    publicadores={publicadores}
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    cargosFiltro={parte.cargosPermitidos}
+                  />
+                )}
+              />
+              {errors.asignado_id && (
+                <p className="text-xs text-destructive">{errors.asignado_id.message}</p>
+              )}
+            </div>
+          )}
 
           {/* Asistente */}
           {parte.tieneAsistente && (
