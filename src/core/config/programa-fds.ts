@@ -29,11 +29,11 @@ export const SECCION_FDS_NOMBRES: Record<SeccionFDS, string> = {
   cierre:   'Cierre',
 }
 
-export const SECCION_FDS_COLORS: Record<SeccionFDS, { header: string; row: string }> = {
-  apertura: { header: 'bg-slate-100 text-slate-700',    row: 'bg-white hover:bg-slate-50'   },
-  discurso: { header: 'bg-violet-100 text-violet-800',  row: 'bg-white hover:bg-violet-50'  },
-  atalaya:  { header: 'bg-sky-100 text-sky-800',        row: 'bg-white hover:bg-sky-50'     },
-  cierre:   { header: 'bg-slate-100 text-slate-700',    row: 'bg-white hover:bg-slate-50'   },
+export const SECCION_FDS_COLORS: Record<SeccionFDS, { header: string; row: string; border: string }> = {
+  apertura: { header: 'bg-slate-100 text-slate-700',    row: 'bg-white hover:bg-slate-50',   border: 'border-l-slate-400'   },
+  discurso: { header: 'bg-violet-100 text-violet-800',  row: 'bg-white hover:bg-violet-50',  border: 'border-l-violet-500'  },
+  atalaya:  { header: 'bg-sky-100 text-sky-800',        row: 'bg-white hover:bg-sky-50',     border: 'border-l-sky-500'     },
+  cierre:   { header: 'bg-slate-100 text-slate-700',    row: 'bg-white hover:bg-slate-50',   border: 'border-l-slate-400'   },
 }
 
 export const PARTES_FDS_POR_SECCION = PROGRAMA_FDS.reduce<Record<SeccionFDS, ParteFDS[]>>(
