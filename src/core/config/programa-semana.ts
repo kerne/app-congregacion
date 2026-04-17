@@ -42,12 +42,12 @@ export const SECCION_NOMBRES: Record<SeccionSemana, string> = {
   cierre: 'Cierre',
 }
 
-export const SECCION_COLORS: Record<SeccionSemana, { header: string; row: string }> = {
-  apertura: { header: 'bg-slate-100 text-slate-700',   row: 'bg-white hover:bg-slate-50' },
-  tesoros:  { header: 'bg-amber-100 text-amber-800',   row: 'bg-white hover:bg-amber-50' },
-  smt:      { header: 'bg-blue-100 text-blue-800',     row: 'bg-white hover:bg-blue-50'  },
-  nvc:      { header: 'bg-emerald-100 text-emerald-800', row: 'bg-white hover:bg-emerald-50' },
-  cierre:   { header: 'bg-slate-100 text-slate-700',   row: 'bg-white hover:bg-slate-50' },
+export const SECCION_COLORS: Record<SeccionSemana, { header: string; row: string; border: string }> = {
+  apertura: { header: 'bg-slate-100 text-slate-700',     row: 'bg-white hover:bg-slate-50',   border: 'border-l-slate-400'   },
+  tesoros:  { header: 'bg-amber-100 text-amber-800',     row: 'bg-white hover:bg-amber-50',   border: 'border-l-amber-500'   },
+  smt:      { header: 'bg-blue-100 text-blue-800',       row: 'bg-white hover:bg-blue-50',    border: 'border-l-blue-500'    },
+  nvc:      { header: 'bg-emerald-100 text-emerald-800', row: 'bg-white hover:bg-emerald-50', border: 'border-l-emerald-500' },
+  cierre:   { header: 'bg-slate-100 text-slate-700',     row: 'bg-white hover:bg-slate-50',   border: 'border-l-slate-400'   },
 }
 
 export const PARTES_POR_SECCION = PROGRAMA_SEMANA.reduce<Record<SeccionSemana, ParteSemana[]>>(

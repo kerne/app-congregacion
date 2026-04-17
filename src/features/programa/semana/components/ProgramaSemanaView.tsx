@@ -20,9 +20,9 @@ export function ProgramaSemanaView({ asignaciones, canEdit, onEdit, emptyMessage
   }
 
   return (
-    <div className="rounded-lg border overflow-hidden">
+    <div className="md:rounded-lg md:border overflow-hidden">
       <table className="w-full text-sm">
-        <thead className="bg-muted/50">
+        <thead className="hidden md:table-header-group bg-muted/50">
           <tr>
             <th className="text-left px-4 py-3 font-medium">Parte</th>
             <th className="text-left px-4 py-3 font-medium">Asignado</th>

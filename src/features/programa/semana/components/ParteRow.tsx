@@ -20,38 +20,98 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteR
   return (
     <tr
       className={cn(
-        'border-t transition-colors',
+        // Desktop: tabla normal
+        'md:table-row md:border-t md:border-l-0 md:rounded-none md:shadow-none md:mx-0 md:my-0',
         colors.row,
+        // Mobile: card
+        'block mx-3 my-1.5 rounded-lg border border-l-4 shadow-sm overflow-hidden transition-colors',
+        colors.border,
         parte.opcional && 'opacity-75',
       )}
     >
-      {/* Parte */}
-      <td className="px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">{parte.nombre}</span>
-          {parte.opcional && (
-            <span className="text-xs text-muted-foreground">(opcional)</span>
-          )}
-          {parte.duracionMin > 0 && (
-            <span className="text-xs text-muted-foreground hidden md:inline">
-              {parte.duracionMin} min
-            </span>
+      {/* Parte + tema — full row en mobile, primera columna en desktop */}
+      <td className="block md:table-cell px-4 py-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            {asignacion?.tema ? (
+              <div>
+                <span className="text-sm font-medium">{asignacion.tema}</span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-xs text-muted-foreground">{parte.nombre}</span>
+                  {parte.opcional && (
+                    <span className="text-xs text-muted-foreground">(opcional)</span>
+                  )}
+                  {parte.duracionMin > 0 && (
+                    <span className="text-xs text-muted-foreground hidden md:inline">
+                      · {parte.duracionMin} min
+                    </span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">{parte.nombre}</span>
+                {parte.opcional && (
+                  <span className="text-xs text-muted-foreground">(opcional)</span>
+                )}
+                {parte.duracionMin > 0 && (
+                  <span className="text-xs text-muted-foreground hidden md:inline">
+                    {parte.duracionMin} min
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Botón editar — solo mobile */}
+          {canEdit && (
+            <div className="md:hidden shrink-0 -mt-0.5 -mr-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => onEdit(parte, asignacion)}
+                title="Asignar"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           )}
         </div>
-        {asignacion?.tema && (
-          <div className="text-xs italic text-foreground/75 mt-0.5">
-            "{asignacion.tema}"
-          </div>
-        )}
+
+        {/* Asignado + asistente — solo mobile */}
+        <div className="md:hidden mt-2 pt-2 border-t border-border/40">
+          {asignacion ? (
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-1.5 text-sm">
+                <UserCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="font-medium">
+                  {asignacion.asignado?.apellido}, {asignacion.asignado?.nombre}
+                </span>
+                {asignacion.sala === 'B' && (
+                  <Badge variant="outline" className="text-xs h-4">Sala B</Badge>
+                )}
+              </div>
+              {asignacion.asistente && (
+                <div className="flex items-center gap-1.5 text-xs text-foreground/70 pl-5">
+                  <UserCircle className="h-3.5 w-3.5 shrink-0" />
+                  <span>{asignacion.asistente.apellido}, {asignacion.asistente.nombre}</span>
+                </div>
+              )}
+            </div>
+          ) : canEdit ? (
+            <Badge variant="warning" className="text-xs">Pendiente</Badge>
+          ) : null}
+        </div>
       </td>
 
-      {/* Asignado */}
-      <td className="px-4 py-2.5">
+      {/* Asignado — solo desktop */}
+      <td className="hidden md:table-cell px-4 py-3">
         {asignacion ? (
-          <div className="space-y-0.5">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-1.5 text-sm">
               <UserCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              <span>
+              <span className="font-medium">
                 {asignacion.asignado?.apellido}, {asignacion.asignado?.nombre}
               </span>
               {asignacion.sala === 'B' && (
@@ -59,9 +119,9 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteR
               )}
             </div>
             {asignacion.asistente && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <UserCircle className="h-3 w-3 shrink-0" />
-                Asistente: {asignacion.asistente.apellido}, {asignacion.asistente.nombre}
+              <div className="flex items-center gap-1.5 text-xs text-foreground/70 pl-5">
+                <UserCircle className="h-3.5 w-3.5 shrink-0" />
+                <span>{asignacion.asistente.apellido}, {asignacion.asistente.nombre}</span>
               </div>
             )}
           </div>
@@ -70,9 +130,9 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteR
         ) : null}
       </td>
 
-      {/* Acciones */}
+      {/* Acciones — solo desktop */}
       {canEdit && (
-        <td className="px-4 py-2.5 text-right">
+        <td className="hidden md:table-cell px-4 py-3 text-right">
           <Button
             variant="ghost"
             size="icon"

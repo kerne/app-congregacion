@@ -19,11 +19,11 @@ export function SeccionPartes({ seccion, partes, asignaciones, canEdit, onEdit }
   )
 
   return (
-    <tbody>
-      <tr>
+    <tbody className="block md:table-row-group">
+      <tr className="block md:table-row">
         <td
           colSpan={canEdit ? 3 : 2}
-          className={cn('px-4 py-2 text-xs font-semibold uppercase tracking-wide', colors.header)}
+          className={cn('block w-full md:table-cell px-4 py-2 text-xs font-semibold uppercase tracking-wide', colors.header)}
         >
           {SECCION_NOMBRES[seccion]}
         </td>
