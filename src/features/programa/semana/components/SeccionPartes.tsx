@@ -18,6 +18,22 @@ export function SeccionPartes({ seccion, partes, asignaciones, canEdit, onEdit }
     asignaciones.map((a) => [a.parte_id, a]),
   )
 
+  // Partes embebidas: se muestran dentro del row de su parte host, no como fila propia
+  const embeddedByHostId = partes.reduce<Record<string, { parte: ParteSemana; asignacion?: AsignacionSemana }[]>>(
+    (acc, parte) => {
+      if (parte.embebidoEn) {
+        acc[parte.embebidoEn] = [
+          ...(acc[parte.embebidoEn] ?? []),
+          { parte, asignacion: asigByParteId[parte.id] },
+        ]
+      }
+      return acc
+    },
+    {},
+  )
+
+  const partesStandalone = partes.filter((p) => !p.embebidoEn)
+
   return (
     <tbody className="block md:table-row-group">
       <tr className="block md:table-row">
@@ -28,7 +44,7 @@ export function SeccionPartes({ seccion, partes, asignaciones, canEdit, onEdit }
           {SECCION_NOMBRES[seccion]}
         </td>
       </tr>
-      {partes.map((parte) => (
+      {partesStandalone.map((parte) => (
         <ParteRow
           key={parte.id}
           parte={parte}
@@ -36,6 +52,7 @@ export function SeccionPartes({ seccion, partes, asignaciones, canEdit, onEdit }
           canEdit={canEdit}
           onEdit={onEdit}
           seccion={seccion}
+          embedded={embeddedByHostId[parte.id]}
         />
       ))}
     </tbody>

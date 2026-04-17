@@ -12,6 +12,8 @@ export interface ParteSemana {
   opcional: boolean
   duracionMin: number
   cargosPermitidos: CargoCongregacion[]
+  /** Si está definido, esta parte se muestra embebida dentro de la fila de la parte indicada */
+  embebidoEn?: string
 }
 
 const AM: CargoCongregacion[] = ['anciano', 'siervo_ministerial']
@@ -28,7 +30,7 @@ export const PROGRAMA_SEMANA: ParteSemana[] = [
   { id: 'smt_parte4',           nombre: 'Parte de Estudiantes 4',             seccion: 'smt',      tieneAsistente: true,  tieneTema: true,  tieneSala: true,  opcional: true,  duracionMin: 4,  cargosPermitidos: TODOS },
   { id: 'nvc_parte1',           nombre: 'Parte Vida Cristiana 1',             seccion: 'nvc',      tieneAsistente: false, tieneTema: true,  tieneSala: false, opcional: false, duracionMin: 15, cargosPermitidos: AM    },
   { id: 'nvc_parte2',           nombre: 'Parte Vida Cristiana 2',             seccion: 'nvc',      tieneAsistente: false, tieneTema: true,  tieneSala: false, opcional: true,  duracionMin: 15, cargosPermitidos: AM    },
-  { id: 'lector_estudio',       nombre: 'Lector del Estudio Bíblico',         seccion: 'nvc',      tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 0,  cargosPermitidos: AM    },
+  { id: 'lector_estudio',       nombre: 'Lector del Estudio Bíblico',         seccion: 'nvc',      tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 0,  cargosPermitidos: AM,           embebidoEn: 'estudio_congregacion' },
   { id: 'estudio_congregacion', nombre: 'Estudio Bíblico de la Congregación', seccion: 'nvc',      tieneAsistente: false, tieneTema: true,  tieneSala: false, opcional: false, duracionMin: 30, cargosPermitidos: ['anciano'] },
   { id: 'cierre',               nombre: 'Cierre (Presidente)',                seccion: 'cierre',   tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 3,  cargosPermitidos: AM    },
   { id: 'oracion_final',        nombre: 'Oración Final',                      seccion: 'cierre',   tieneAsistente: false, tieneTema: false, tieneSala: false, opcional: false, duracionMin: 0,  cargosPermitidos: AM    },

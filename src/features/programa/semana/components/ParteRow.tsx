@@ -12,9 +12,36 @@ interface ParteRowProps {
   canEdit:        boolean
   onEdit:         (parte: ParteSemana, asignacion?: AsignacionSemana) => void
   seccion:        SeccionSemana
+  embedded?:      { parte: ParteSemana; asignacion?: AsignacionSemana }[]
 }
 
-export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteRowProps) {
+function AsignadoDisplay({ asignacion, canEdit }: { asignacion?: AsignacionSemana; canEdit: boolean }) {
+  if (asignacion) {
+    return (
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-1.5 text-sm">
+          <UserCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+          <span className="font-medium">
+            {asignacion.asignado?.apellido}, {asignacion.asignado?.nombre}
+          </span>
+          {asignacion.sala === 'B' && (
+            <Badge variant="outline" className="text-xs h-4">Sala B</Badge>
+          )}
+        </div>
+        {asignacion.asistente && (
+          <div className="flex items-center gap-1.5 text-xs text-foreground/70 pl-5">
+            <UserCircle className="h-3.5 w-3.5 shrink-0" />
+            <span>{asignacion.asistente.apellido}, {asignacion.asistente.nombre}</span>
+          </div>
+        )}
+      </div>
+    )
+  }
+  if (canEdit) return <Badge variant="warning" className="text-xs">Pendiente</Badge>
+  return null
+}
+
+export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion, embedded }: ParteRowProps) {
   const colors = SECCION_COLORS[seccion]
 
   return (
@@ -81,67 +108,77 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion }: ParteR
 
         {/* Asignado + asistente — solo mobile */}
         <div className="md:hidden mt-2 pt-2 border-t border-border/40">
-          {asignacion ? (
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-1.5 text-sm">
-                <UserCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="font-medium">
-                  {asignacion.asignado?.apellido}, {asignacion.asignado?.nombre}
-                </span>
-                {asignacion.sala === 'B' && (
-                  <Badge variant="outline" className="text-xs h-4">Sala B</Badge>
-                )}
-              </div>
-              {asignacion.asistente && (
-                <div className="flex items-center gap-1.5 text-xs text-foreground/70 pl-5">
-                  <UserCircle className="h-3.5 w-3.5 shrink-0" />
-                  <span>{asignacion.asistente.apellido}, {asignacion.asistente.nombre}</span>
-                </div>
-              )}
-            </div>
-          ) : canEdit ? (
-            <Badge variant="warning" className="text-xs">Pendiente</Badge>
-          ) : null}
+          <AsignadoDisplay asignacion={asignacion} canEdit={canEdit} />
         </div>
+
+        {/* Partes embebidas — solo mobile */}
+        {embedded && embedded.length > 0 && (
+          <div className="md:hidden mt-2 space-y-2">
+            {embedded.map(({ parte: ep, asignacion: ea }) => (
+              <div key={ep.id} className="pt-2 border-t border-border/40">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">{ep.nombre}</span>
+                  {canEdit && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 shrink-0 -mt-0.5 -mr-1"
+                      onClick={() => onEdit(ep, ea)}
+                      title="Asignar"
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                <div className="mt-1">
+                  <AsignadoDisplay asignacion={ea} canEdit={canEdit} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </td>
 
       {/* Asignado — solo desktop */}
       <td className="hidden md:table-cell px-4 py-3">
-        {asignacion ? (
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-1.5 text-sm">
-              <UserCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              <span className="font-medium">
-                {asignacion.asignado?.apellido}, {asignacion.asignado?.nombre}
-              </span>
-              {asignacion.sala === 'B' && (
-                <Badge variant="outline" className="text-xs h-4">Sala B</Badge>
-              )}
+        <div className="space-y-3">
+          <AsignadoDisplay asignacion={asignacion} canEdit={canEdit} />
+          {embedded && embedded.map(({ parte: ep, asignacion: ea }) => (
+            <div key={ep.id} className="pt-2 border-t border-border/30">
+              <div className="text-xs text-muted-foreground mb-1">{ep.nombre}</div>
+              <AsignadoDisplay asignacion={ea} canEdit={canEdit} />
             </div>
-            {asignacion.asistente && (
-              <div className="flex items-center gap-1.5 text-xs text-foreground/70 pl-5">
-                <UserCircle className="h-3.5 w-3.5 shrink-0" />
-                <span>{asignacion.asistente.apellido}, {asignacion.asistente.nombre}</span>
-              </div>
-            )}
-          </div>
-        ) : canEdit ? (
-          <Badge variant="warning" className="text-xs">Pendiente</Badge>
-        ) : null}
+          ))}
+        </div>
       </td>
 
       {/* Acciones — solo desktop */}
       {canEdit && (
-        <td className="hidden md:table-cell px-4 py-3 text-right">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => onEdit(parte, asignacion)}
-            title="Asignar"
-          >
-            <Pencil className="h-3.5 w-3.5" />
-          </Button>
+        <td className="hidden md:table-cell px-4 py-3 text-right align-top">
+          <div className="space-y-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => onEdit(parte, asignacion)}
+              title="Asignar"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+            {embedded && embedded.map(({ parte: ep, asignacion: ea }) => (
+              <div key={ep.id} className="pt-2 border-t border-border/30 flex justify-end">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => onEdit(ep, ea)}
+                  title="Asignar"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
         </td>
       )}
     </tr>
