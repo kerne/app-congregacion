@@ -87,17 +87,34 @@ export function FinDeSemana() {
           parte={modal.parte}
           asignacionActual={modal.asignacion}
           publicadores={publicadoresPublicos}
-          onSave={(data) =>
-            upsert.mutateAsync({
+          onSave={async (data) => {
+            await upsert.mutateAsync({
               fecha,
               parteId:      modal.parte.id,
               data,
               asignacionId: modal.asignacion?.id,
             })
-          }
+            if (modal.parte.id === 'fds_orador') {
+              const oracionFinal = asignaciones.find((a) => a.parte_id === 'fds_oracion_final')
+              await upsert.mutateAsync({
+                fecha,
+                parteId:      'fds_oracion_final',
+                data,
+                asignacionId: oracionFinal?.id,
+              })
+            }
+          }}
           onDelete={
             modal.asignacion
-              ? () => eliminar.mutateAsync({ id: modal.asignacion!.id, fecha })
+              ? async () => {
+                  await eliminar.mutateAsync({ id: modal.asignacion!.id, fecha })
+                  if (modal.parte.id === 'fds_orador') {
+                    const oracionFinal = asignaciones.find((a) => a.parte_id === 'fds_oracion_final')
+                    if (oracionFinal) {
+                      await eliminar.mutateAsync({ id: oracionFinal.id, fecha })
+                    }
+                  }
+                }
               : undefined
           }
           isSaving={upsert.isPending}
