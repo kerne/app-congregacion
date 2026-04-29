@@ -9,29 +9,77 @@ import type { AsignacionSemana } from '@/core/supabase/types'
 interface ParteRowProps {
   parte:          ParteSemana
   asignacion?:    AsignacionSemana
+  asignacionB?:   AsignacionSemana
   canEdit:        boolean
   onEdit:         (parte: ParteSemana, asignacion?: AsignacionSemana) => void
   seccion:        SeccionSemana
   embedded?:      { parte: ParteSemana; asignacion?: AsignacionSemana }[]
 }
 
-function AsignadoDisplay({ asignacion, canEdit }: { asignacion?: AsignacionSemana; canEdit: boolean }) {
-  if (asignacion) {
-    return (
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-1.5 text-sm">
-          <UserCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-          <span className="font-medium">
-            {asignacion.asignado?.apellido}, {asignacion.asignado?.nombre}
-          </span>
-          {asignacion.sala === 'B' && (
-            <Badge variant="outline" className="text-xs h-4">Sala B</Badge>
-          )}
+function AsignadoLine({ asignacion, showSala }: { asignacion: AsignacionSemana; showSala?: boolean }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center gap-1.5 text-sm">
+        <UserCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        <span className="font-medium">
+          {asignacion.asignado
+            ? `${asignacion.asignado.apellido}, ${asignacion.asignado.nombre}`
+            : <span className="text-muted-foreground italic">Sin asignar</span>}
+        </span>
+        {showSala && asignacion.sala && (
+          <Badge variant="outline" className="text-xs h-4">
+            {asignacion.sala === 'B' ? 'Sala B' : 'Sala Principal'}
+          </Badge>
+        )}
+      </div>
+      {asignacion.asistente && (
+        <div className="flex items-center gap-1.5 text-xs text-foreground/70 pl-5">
+          <UserCircle className="h-3.5 w-3.5 shrink-0" />
+          <span>{asignacion.asistente.apellido}, {asignacion.asistente.nombre}</span>
         </div>
-        {asignacion.asistente && (
-          <div className="flex items-center gap-1.5 text-xs text-foreground/70 pl-5">
-            <UserCircle className="h-3.5 w-3.5 shrink-0" />
-            <span>{asignacion.asistente.apellido}, {asignacion.asistente.nombre}</span>
+      )}
+    </div>
+  )
+}
+
+function AsignadoDisplay({
+  asignacion,
+  asignacionB,
+  canEdit,
+  onEdit,
+  parte,
+}: {
+  asignacion?: AsignacionSemana
+  asignacionB?: AsignacionSemana
+  canEdit: boolean
+  onEdit: (parte: ParteSemana, asignacion?: AsignacionSemana) => void
+  parte: ParteSemana
+}) {
+  const hasBoth = !!asignacion && !!asignacionB
+
+  if (asignacion || asignacionB) {
+    return (
+      <div className="space-y-2">
+        {asignacion && (
+          <div className="flex items-start justify-between gap-2">
+            <AsignadoLine asignacion={asignacion} showSala={hasBoth} />
+            {canEdit && (
+              <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0 hidden md:flex"
+                onClick={() => onEdit(parte, asignacion)} title="Editar Sala Principal">
+                <Pencil className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        )}
+        {asignacionB && (
+          <div className="flex items-start justify-between gap-2">
+            <AsignadoLine asignacion={asignacionB} showSala={hasBoth} />
+            {canEdit && (
+              <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0 hidden md:flex"
+                onClick={() => onEdit(parte, asignacionB)} title="Editar Sala B">
+                <Pencil className="h-3 w-3" />
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -41,7 +89,7 @@ function AsignadoDisplay({ asignacion, canEdit }: { asignacion?: AsignacionSeman
   return null
 }
 
-export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion, embedded }: ParteRowProps) {
+export function ParteRow({ parte, asignacion, asignacionB, canEdit, onEdit, seccion, embedded }: ParteRowProps) {
   const colors = SECCION_COLORS[seccion]
 
   return (
@@ -108,7 +156,7 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion, embedded
 
         {/* Asignado + asistente — solo mobile */}
         <div className="md:hidden mt-2 pt-2 border-t border-border/40">
-          <AsignadoDisplay asignacion={asignacion} canEdit={canEdit} />
+          <AsignadoDisplay asignacion={asignacion} asignacionB={asignacionB} canEdit={canEdit} onEdit={onEdit} parte={parte} />
         </div>
 
         {/* Partes embebidas — solo mobile */}
@@ -142,18 +190,18 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion, embedded
       {/* Asignado — solo desktop */}
       <td className="hidden md:table-cell px-4 py-3">
         <div className="space-y-3">
-          <AsignadoDisplay asignacion={asignacion} canEdit={canEdit} />
+          <AsignadoDisplay asignacion={asignacion} asignacionB={asignacionB} canEdit={canEdit} onEdit={onEdit} parte={parte} />
           {embedded && embedded.map(({ parte: ep, asignacion: ea }) => (
             <div key={ep.id} className="pt-2 border-t border-border/30">
               <div className="text-xs text-muted-foreground mb-1">{ep.nombre}</div>
-              <AsignadoDisplay asignacion={ea} canEdit={canEdit} />
+              <AsignadoDisplay asignacion={ea} canEdit={canEdit} onEdit={onEdit} parte={ep} />
             </div>
           ))}
         </div>
       </td>
 
-      {/* Acciones — solo desktop */}
-      {canEdit && (
+      {/* Acciones — solo desktop: botón global solo cuando no hay salas separadas */}
+      {canEdit && !asignacionB && (
         <td className="hidden md:table-cell px-4 py-3 text-right align-top">
           <div className="space-y-3">
             <Button
@@ -181,6 +229,7 @@ export function ParteRow({ parte, asignacion, canEdit, onEdit, seccion, embedded
           </div>
         </td>
       )}
+      {canEdit && asignacionB && <td className="hidden md:table-cell" />}
     </tr>
   )
 }

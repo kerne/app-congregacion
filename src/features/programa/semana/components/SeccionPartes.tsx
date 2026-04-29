@@ -14,9 +14,17 @@ interface SeccionPartesProps {
 
 export function SeccionPartes({ seccion, partes, asignaciones, canEdit, onEdit }: SeccionPartesProps) {
   const colors = SECCION_COLORS[seccion]
-  const asigByParteId = Object.fromEntries(
-    asignaciones.map((a) => [a.parte_id, a]),
-  )
+
+  // Separar por sala para no perder ninguna cuando hay sala principal y sala B
+  const asigPrincipalById: Record<string, AsignacionSemana> = {}
+  const asigBById: Record<string, AsignacionSemana> = {}
+  for (const a of asignaciones) {
+    if (a.sala === 'B') {
+      asigBById[a.parte_id] = a
+    } else {
+      asigPrincipalById[a.parte_id] = a
+    }
+  }
 
   // Partes embebidas: se muestran dentro del row de su parte host, no como fila propia
   const embeddedByHostId = partes.reduce<Record<string, { parte: ParteSemana; asignacion?: AsignacionSemana }[]>>(
@@ -24,7 +32,7 @@ export function SeccionPartes({ seccion, partes, asignaciones, canEdit, onEdit }
       if (parte.embebidoEn) {
         acc[parte.embebidoEn] = [
           ...(acc[parte.embebidoEn] ?? []),
-          { parte, asignacion: asigByParteId[parte.id] },
+          { parte, asignacion: asigPrincipalById[parte.id] },
         ]
       }
       return acc
@@ -48,7 +56,8 @@ export function SeccionPartes({ seccion, partes, asignaciones, canEdit, onEdit }
         <ParteRow
           key={parte.id}
           parte={parte}
-          asignacion={asigByParteId[parte.id]}
+          asignacion={asigPrincipalById[parte.id]}
+          asignacionB={asigBById[parte.id]}
           canEdit={canEdit}
           onEdit={onEdit}
           seccion={seccion}
