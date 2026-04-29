@@ -6,7 +6,7 @@ import { SeccionPartes } from './SeccionPartes'
 interface ProgramaSemanaViewProps {
   asignaciones: AsignacionSemana[]
   canEdit:      boolean
-  onEdit:       (parte: ParteSemana, asignacion?: AsignacionSemana) => void
+  onEdit:       (parte: ParteSemana, asignacion?: AsignacionSemana, salaHint?: 'principal' | 'B') => void
   emptyMessage?: string
 }
 

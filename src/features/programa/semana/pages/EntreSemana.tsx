@@ -23,7 +23,7 @@ import type { AsignacionSemana, PublicadorPublico } from '@/core/supabase/types'
 
 export function EntreSemana() {
   const [semana, setSemana] = useState(() => toISODate(getLunesDeSemana(new Date())))
-  const [modal, setModal]   = useState<{ parte: ParteSemana; asignacion?: AsignacionSemana } | null>(null)
+  const [modal, setModal]   = useState<{ parte: ParteSemana; asignacion?: AsignacionSemana; salaHint?: 'principal' | 'B' } | null>(null)
 
   const { isEditor, loading } = useCurrentUser()
   const { data: asignaciones = [], isLoading, isError, refetch } = useProgramaSemana(semana)
@@ -35,8 +35,8 @@ export function EntreSemana() {
     ({ id, nombre, apellido, rol, cargo }) => ({ id, nombre, apellido, rol, cargo }),
   )
 
-  function handleEdit(parte: ParteSemana, asignacion?: AsignacionSemana) {
-    setModal({ parte, asignacion })
+  function handleEdit(parte: ParteSemana, asignacion?: AsignacionSemana, salaHint?: 'principal' | 'B') {
+    setModal({ parte, asignacion, salaHint })
   }
 
   return (
@@ -88,7 +88,7 @@ export function EntreSemana() {
           open={!!modal}
           onClose={() => setModal(null)}
           parte={modal.parte}
-          asignacionActual={modal.asignacion}
+          asignacionActual={modal.asignacion ?? (modal.salaHint ? { sala: modal.salaHint } : undefined)}
           publicadores={publicadoresPublicos}
           onSave={(data) =>
             upsert.mutateAsync({

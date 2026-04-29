@@ -9,7 +9,7 @@ interface SeccionPartesProps {
   partes:      ParteSemana[]
   asignaciones: AsignacionSemana[]
   canEdit:     boolean
-  onEdit:      (parte: ParteSemana, asignacion?: AsignacionSemana) => void
+  onEdit:      (parte: ParteSemana, asignacion?: AsignacionSemana, salaHint?: 'principal' | 'B') => void
 }
 
 export function SeccionPartes({ seccion, partes, asignaciones, canEdit, onEdit }: SeccionPartesProps) {

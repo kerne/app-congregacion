@@ -8,15 +8,17 @@ import type { AsignacionSemana } from '@/core/supabase/types'
 
 interface ParteRowProps {
   parte:          ParteSemana
-  asignacion?:    AsignacionSemana
-  asignacionB?:   AsignacionSemana
+  asignacion?:    AsignacionSemana       // sala principal (o sin sala)
+  asignacionB?:   AsignacionSemana       // sala B
   canEdit:        boolean
-  onEdit:         (parte: ParteSemana, asignacion?: AsignacionSemana) => void
+  onEdit:         (parte: ParteSemana, asignacion?: AsignacionSemana, salaHint?: 'principal' | 'B') => void
   seccion:        SeccionSemana
   embedded?:      { parte: ParteSemana; asignacion?: AsignacionSemana }[]
 }
 
-function AsignadoLine({ asignacion, showSala }: { asignacion: AsignacionSemana; showSala?: boolean }) {
+// ── Persona asignada (una línea) ─────────────────────────────────────────────
+
+function PersonaLine({ asignacion }: { asignacion: AsignacionSemana }) {
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-1.5 text-sm">
@@ -26,11 +28,6 @@ function AsignadoLine({ asignacion, showSala }: { asignacion: AsignacionSemana; 
             ? `${asignacion.asignado.apellido}, ${asignacion.asignado.nombre}`
             : <span className="text-muted-foreground italic">Sin asignar</span>}
         </span>
-        {showSala && asignacion.sala && (
-          <Badge variant="outline" className="text-xs h-4">
-            {asignacion.sala === 'B' ? 'Sala B' : 'Sala Principal'}
-          </Badge>
-        )}
       </div>
       {asignacion.asistente && (
         <div className="flex items-center gap-1.5 text-xs text-foreground/70 pl-5">
@@ -42,124 +39,131 @@ function AsignadoLine({ asignacion, showSala }: { asignacion: AsignacionSemana; 
   )
 }
 
-function AsignadoDisplay({
+// ── Slot de sala (principal o B) — siempre visible para tieneSala ────────────
+
+function SalaSlot({
+  label,
   asignacion,
-  asignacionB,
   canEdit,
-  onEdit,
-  parte,
+  onEditClick,
+}: {
+  label: string
+  asignacion?: AsignacionSemana
+  canEdit: boolean
+  onEditClick: () => void
+}) {
+  return (
+    <div className="flex items-center justify-between gap-2 py-1 first:pt-0 last:pb-0">
+      <div className="flex items-start gap-2 min-w-0">
+        <span className="text-xs text-muted-foreground shrink-0 pt-0.5 w-20">{label}</span>
+        <div className="min-w-0">
+          {asignacion
+            ? <PersonaLine asignacion={asignacion} />
+            : canEdit
+              ? <Badge variant="warning" className="text-xs">Pendiente</Badge>
+              : null}
+        </div>
+      </div>
+      {canEdit && (
+        <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={onEditClick} title={`Asignar ${label}`}>
+          <Pencil className="h-3 w-3" />
+        </Button>
+      )}
+    </div>
+  )
+}
+
+// ── Display para partes sin sala (comportamiento original) ───────────────────
+
+function AsignadoSimple({
+  asignacion,
+  canEdit,
 }: {
   asignacion?: AsignacionSemana
-  asignacionB?: AsignacionSemana
   canEdit: boolean
-  onEdit: (parte: ParteSemana, asignacion?: AsignacionSemana) => void
-  parte: ParteSemana
 }) {
-  const hasBoth = !!asignacion && !!asignacionB
-
-  if (asignacion || asignacionB) {
-    return (
-      <div className="space-y-2">
-        {asignacion && (
-          <div className="flex items-start justify-between gap-2">
-            <AsignadoLine asignacion={asignacion} showSala={hasBoth} />
-            {canEdit && (
-              <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0 hidden md:flex"
-                onClick={() => onEdit(parte, asignacion)} title="Editar Sala Principal">
-                <Pencil className="h-3 w-3" />
-              </Button>
-            )}
-          </div>
-        )}
-        {asignacionB && (
-          <div className="flex items-start justify-between gap-2">
-            <AsignadoLine asignacion={asignacionB} showSala={hasBoth} />
-            {canEdit && (
-              <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0 hidden md:flex"
-                onClick={() => onEdit(parte, asignacionB)} title="Editar Sala B">
-                <Pencil className="h-3 w-3" />
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
-    )
-  }
+  if (asignacion) return <PersonaLine asignacion={asignacion} />
   if (canEdit) return <Badge variant="warning" className="text-xs">Pendiente</Badge>
   return null
 }
 
+// ── Row principal ─────────────────────────────────────────────────────────────
+
 export function ParteRow({ parte, asignacion, asignacionB, canEdit, onEdit, seccion, embedded }: ParteRowProps) {
   const colors = SECCION_COLORS[seccion]
+
+  const temaDisplay = asignacion?.tema ?? asignacionB?.tema
 
   return (
     <tr
       className={cn(
-        // Desktop: tabla normal
         'md:table-row md:border-t md:border-l-0 md:rounded-none md:shadow-none md:mx-0 md:my-0',
         colors.row,
-        // Mobile: card
         'block mx-3 my-1.5 rounded-lg border border-l-4 shadow-sm overflow-hidden transition-colors',
         colors.border,
         parte.opcional && 'opacity-75',
       )}
     >
-      {/* Parte + tema — full row en mobile, primera columna en desktop */}
+      {/* Parte + tema */}
       <td className="block md:table-cell px-4 py-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            {asignacion?.tema ? (
+            {temaDisplay ? (
               <div>
-                <span className="text-sm font-medium">{asignacion.tema}</span>
+                <span className="text-sm font-medium">{temaDisplay}</span>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="text-xs text-muted-foreground">{parte.nombre}</span>
-                  {parte.opcional && (
-                    <span className="text-xs text-muted-foreground">(opcional)</span>
-                  )}
+                  {parte.opcional && <span className="text-xs text-muted-foreground">(opcional)</span>}
                   {parte.duracionMin > 0 && (
-                    <span className="text-xs text-muted-foreground hidden md:inline">
-                      · {parte.duracionMin} min
-                    </span>
+                    <span className="text-xs text-muted-foreground hidden md:inline">· {parte.duracionMin} min</span>
                   )}
                 </div>
               </div>
             ) : (
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">{parte.nombre}</span>
-                {parte.opcional && (
-                  <span className="text-xs text-muted-foreground">(opcional)</span>
-                )}
+                {parte.opcional && <span className="text-xs text-muted-foreground">(opcional)</span>}
                 {parte.duracionMin > 0 && (
-                  <span className="text-xs text-muted-foreground hidden md:inline">
-                    {parte.duracionMin} min
-                  </span>
+                  <span className="text-xs text-muted-foreground hidden md:inline">{parte.duracionMin} min</span>
                 )}
               </div>
             )}
           </div>
 
-          {/* Botón editar — solo mobile */}
-          {canEdit && (
+          {/* Botón editar mobile — solo para partes sin sala */}
+          {canEdit && !parte.tieneSala && (
             <div className="md:hidden shrink-0 -mt-0.5 -mr-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={() => onEdit(parte, asignacion)}
-                title="Asignar"
-              >
+              <Button variant="ghost" size="icon" className="h-7 w-7"
+                onClick={() => onEdit(parte, asignacion)} title="Asignar">
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
             </div>
           )}
         </div>
 
-        {/* Asignado + asistente — solo mobile */}
+        {/* Asignado mobile */}
         <div className="md:hidden mt-2 pt-2 border-t border-border/40">
-          <AsignadoDisplay asignacion={asignacion} asignacionB={asignacionB} canEdit={canEdit} onEdit={onEdit} parte={parte} />
+          {parte.tieneSala ? (
+            <div className="space-y-1 divide-y divide-border/30">
+              <SalaSlot
+                label="Principal"
+                asignacion={asignacion}
+                canEdit={canEdit}
+                onEditClick={() => onEdit(parte, asignacion, 'principal')}
+              />
+              <SalaSlot
+                label="Sala B"
+                asignacion={asignacionB}
+                canEdit={canEdit}
+                onEditClick={() => onEdit(parte, asignacionB, 'B')}
+              />
+            </div>
+          ) : (
+            <AsignadoSimple asignacion={asignacion} canEdit={canEdit} />
+          )}
         </div>
 
-        {/* Partes embebidas — solo mobile */}
+        {/* Partes embebidas mobile */}
         {embedded && embedded.length > 0 && (
           <div className="md:hidden mt-2 space-y-2">
             {embedded.map(({ parte: ep, asignacion: ea }) => (
@@ -167,19 +171,14 @@ export function ParteRow({ parte, asignacion, asignacionB, canEdit, onEdit, secc
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-xs text-muted-foreground">{ep.nombre}</span>
                   {canEdit && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 shrink-0 -mt-0.5 -mr-1"
-                      onClick={() => onEdit(ep, ea)}
-                      title="Asignar"
-                    >
+                    <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0 -mt-0.5 -mr-1"
+                      onClick={() => onEdit(ep, ea)} title="Asignar">
                       <Pencil className="h-3 w-3" />
                     </Button>
                   )}
                 </div>
                 <div className="mt-1">
-                  <AsignadoDisplay asignacion={ea} canEdit={canEdit} />
+                  <AsignadoSimple asignacion={ea} canEdit={canEdit} />
                 </div>
               </div>
             ))}
@@ -187,41 +186,50 @@ export function ParteRow({ parte, asignacion, asignacionB, canEdit, onEdit, secc
         )}
       </td>
 
-      {/* Asignado — solo desktop */}
+      {/* Asignado desktop */}
       <td className="hidden md:table-cell px-4 py-3">
         <div className="space-y-3">
-          <AsignadoDisplay asignacion={asignacion} asignacionB={asignacionB} canEdit={canEdit} onEdit={onEdit} parte={parte} />
-          {embedded && embedded.map(({ parte: ep, asignacion: ea }) => (
-            <div key={ep.id} className="pt-2 border-t border-border/30">
-              <div className="text-xs text-muted-foreground mb-1">{ep.nombre}</div>
-              <AsignadoDisplay asignacion={ea} canEdit={canEdit} onEdit={onEdit} parte={ep} />
+          {parte.tieneSala ? (
+            <div className="space-y-1 divide-y divide-border/30">
+              <SalaSlot
+                label="Principal"
+                asignacion={asignacion}
+                canEdit={canEdit}
+                onEditClick={() => onEdit(parte, asignacion, 'principal')}
+              />
+              <SalaSlot
+                label="Sala B"
+                asignacion={asignacionB}
+                canEdit={canEdit}
+                onEditClick={() => onEdit(parte, asignacionB, 'B')}
+              />
             </div>
-          ))}
+          ) : (
+            <>
+              <AsignadoSimple asignacion={asignacion} canEdit={canEdit} />
+              {embedded && embedded.map(({ parte: ep, asignacion: ea }) => (
+                <div key={ep.id} className="pt-2 border-t border-border/30">
+                  <div className="text-xs text-muted-foreground mb-1">{ep.nombre}</div>
+                  <AsignadoSimple asignacion={ea} canEdit={canEdit} />
+                </div>
+              ))}
+            </>
+          )}
         </div>
       </td>
 
-      {/* Acciones — solo desktop: botón global solo cuando no hay salas separadas */}
-      {canEdit && !asignacionB && (
+      {/* Acciones desktop — solo para partes sin sala */}
+      {!parte.tieneSala && canEdit && (
         <td className="hidden md:table-cell px-4 py-3 text-right align-top">
           <div className="space-y-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => onEdit(parte, asignacion)}
-              title="Asignar"
-            >
+            <Button variant="ghost" size="icon" className="h-8 w-8"
+              onClick={() => onEdit(parte, asignacion)} title="Asignar">
               <Pencil className="h-3.5 w-3.5" />
             </Button>
             {embedded && embedded.map(({ parte: ep, asignacion: ea }) => (
               <div key={ep.id} className="pt-2 border-t border-border/30 flex justify-end">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => onEdit(ep, ea)}
-                  title="Asignar"
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8"
+                  onClick={() => onEdit(ep, ea)} title="Asignar">
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
               </div>
@@ -229,7 +237,8 @@ export function ParteRow({ parte, asignacion, asignacionB, canEdit, onEdit, secc
           </div>
         </td>
       )}
-      {canEdit && asignacionB && <td className="hidden md:table-cell" />}
+      {/* Celda vacía para mantener layout cuando tieneSala (los botones están inline) */}
+      {parte.tieneSala && canEdit && <td className="hidden md:table-cell" />}
     </tr>
   )
 }
